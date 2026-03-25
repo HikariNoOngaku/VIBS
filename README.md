@@ -1,6 +1,6 @@
-# 🎯 HubSpot Role Enricher MVP
+# 🎯 VIBS CRM Assistant
 
-A simple web app that uses Claude AI to automatically deduce and populate `role_inferred_l1` field for HubSpot contacts.
+Intelligent contact enrichment using Claude AI. Automatically deduce and populate `role_inferred_l1` field for HubSpot contacts.
 
 ## What It Does
 

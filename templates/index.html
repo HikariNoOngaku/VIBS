@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HubSpot Role Enricher</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+            width: 100%;
+            padding: 40px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-box {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+            text-transform: uppercase;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            margin-top: 10px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .results {
+            display: none;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .badge-auto {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-review {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-warning {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .contact-item {
+            background: #f9f9f9;
+            border: 1px solid #eee;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .contact-info h3 {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .contact-detail {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 3px;
+        }
+
+        .contact-role {
+            font-size: 13px;
+            font-weight: 600;
+            color: #667eea;
+            margin-top: 5px;
+        }
+
+        .contact-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-small:hover {
+            background: #5568d3;
+        }
+
+        .btn-skip {
+            background: #ddd;
+            color: #666;
+        }
+
+        .btn-skip:hover {
+            background: #ccc;
+        }
+
+        .confidence {
+            font-size: 11px;
+            color: #999;
+            margin-top: 3px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state p {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 HubSpot Role Enricher</h1>
+        <p class="subtitle">Automatically deduce contact roles using Claude AI</p>
+
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat-box">
+                <div class="stat-number" id="count-auto">0</div>
+                <div class="stat-label">Auto-Approved</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number" id="count-review">0</div>
+                <div class="stat-label">For Review</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number" id="count-total">0</div>
+                <div class="stat-label">Total Processed</div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="button-group">
+            <button class="btn-primary" id="btn-enrich">Start Enrichment (5 Contacts)</button>
+            <button class="btn-secondary" id="btn-reset">Reset</button>
+        </div>
+
+        <!-- Loading State -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <div class="loading-text">Analyzing contacts with Claude AI...</div>
+        </div>
+
+        <!-- Results -->
+        <div class="results" id="results">
+            <!-- Auto-Approved Section -->
+            <div class="section" id="section-auto">
+                <div class="section-title">
+                    ✅ Auto-Approved (>95% Confidence)
+                    <span class="badge badge-auto" id="badge-auto">0</span>
+                </div>
+                <div id="auto-list">
+                    <div class="empty-state">No auto-approved contacts</div>
+                </div>
+            </div>
+
+            <!-- Review Queue Section -->
+            <div class="section" id="section-review">
+                <div class="section-title">
+                    ⚠️ Review Queue (<95% Confidence)
+                    <span class="badge badge-review" id="badge-review">0</span>
+                </div>
+                <div id="review-list">
+                    <div class="empty-state">No contacts to review</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = "/api";
+
+        document.getElementById("btn-enrich").addEventListener("click", startEnrichment);
+        document.getElementById("btn-reset").addEventListener("click", resetUI);
+
+        async function startEnrichment() {
+            const btn = document.getElementById("btn-enrich");
+            btn.disabled = true;
+            document.getElementById("loading").style.display = "block";
+            document.getElementById("results").style.display = "none";
+
+            try {
+                const response = await fetch(`${API_BASE}/enrich`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ action: "fetch" })
+                });
+
+                const data = await response.json();
+                displayResults(data);
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Error enriching contacts: " + error.message);
+            } finally {
+                document.getElementById("loading").style.display = "none";
+                btn.disabled = false;
+            }
+        }
+
+        function displayResults(data) {
+            const autoApproved = data.auto_approved || [];
+            const reviewQueue = data.review_queue || [];
+            const total = autoApproved.length + reviewQueue.length;
+
+            // Update stats
+            document.getElementById("count-auto").textContent = autoApproved.length;
+            document.getElementById("count-review").textContent = reviewQueue.length;
+            document.getElementById("count-total").textContent = total;
+            document.getElementById("badge-auto").textContent = autoApproved.length;
+            document.getElementById("badge-review").textContent = reviewQueue.length;
+
+            // Display auto-approved
+            const autoList = document.getElementById("auto-list");
+            if (autoApproved.length > 0) {
+                autoList.innerHTML = autoApproved.map(contact => `
+                    <div class="contact-item">
+                        <div class="contact-info">
+                            <h3>${contact.name}</h3>
+                            <div class="contact-detail">Job Title: ${contact.job_title}</div>
+                            <div class="contact-role">→ ${contact.suggested_role}</div>
+                            <div class="confidence">Confidence: ${contact.confidence}%</div>
+                            <div class="contact-detail"><em>${contact.reasoning}</em></div>
+                        </div>
+                    </div>
+                `).join("");
+            }
+
+            // Display review queue
+            const reviewList = document.getElementById("review-list");
+            if (reviewQueue.length > 0) {
+                reviewList.innerHTML = reviewQueue.map(contact => `
+                    <div class="contact-item">
+                        <div class="contact-info">
+                            <h3>${contact.name}</h3>
+                            <div class="contact-detail">Job Title: ${contact.job_title}</div>
+                            <div class="contact-role">→ ${contact.suggested_role}</div>
+                            <div class="confidence">Confidence: ${contact.confidence}% ⚠️</div>
+                            <div class="contact-detail"><em>${contact.reasoning}</em></div>
+                        </div>
+                        <div class="contact-actions">
+                            <button class="btn-small" onclick="approveContact('${contact.id}', '${contact.suggested_role}', ${contact.confidence})">Approve</button>
+                            <button class="btn-small btn-skip" onclick="skipContact('${contact.id}')">Skip</button>
+                        </div>
+                    </div>
+                `).join("");
+            }
+
+            document.getElementById("results").style.display = "block";
+        }
+
+        async function approveContact(contactId, role, confidence) {
+            try {
+                await fetch(`${API_BASE}/enrich`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        action: "approve",
+                        contact_id: contactId,
+                        role: role,
+                        confidence: confidence
+                    })
+                });
+                alert("Contact approved and saved to HubSpot!");
+            } catch (error) {
+                alert("Error approving contact: " + error.message);
+            }
+        }
+
+        function skipContact(contactId) {
+            alert("Contact skipped");
+        }
+
+        function resetUI() {
+            document.getElementById("results").style.display = "none";
+            document.getElementById("loading").style.display = "none";
+            document.getElementById("count-auto").textContent = "0";
+            document.getElementById("count-review").textContent = "0";
+            document.getElementById("count-total").textContent = "0";
+        }
+    </script>
+</body>
+</html>

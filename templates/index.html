@@ -254,41 +254,191 @@
         .empty-state p {
             margin-bottom: 10px;
         }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .tab-btn {
+            padding: 12px 20px;
+            background: none;
+            border: none;
+            border-bottom: 3px solid transparent;
+            font-size: 14px;
+            font-weight: 600;
+            color: #999;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-btn:hover {
+            color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .sources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .source-card {
+            padding: 15px;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f9f9f9;
+        }
+
+        .source-card:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .source-card.selected {
+            border-color: #667eea;
+            background: #f0f4ff;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        .source-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .source-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .source-status {
+            font-size: 11px;
+            color: #999;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🎯 VIBS CRM Assistant</h1>
-        <p class="subtitle">Intelligent contact enrichment & role deduction</p>
+        <p class="subtitle">Intelligent contact enrichment from internal & online sources</p>
 
-        <!-- Stats -->
-        <div class="stats">
-            <div class="stat-box">
-                <div class="stat-number" id="count-auto">0</div>
-                <div class="stat-label">Auto-Approved</div>
+        <!-- Enrichment Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="internal">📊 Internal Data</button>
+            <button class="tab-btn" data-tab="online">🌐 Online Sources</button>
+        </div>
+
+        <!-- Internal Data Enrichment Tab -->
+        <div id="internal" class="tab-content active">
+            <!-- Stats -->
+            <div class="stats">
+                <div class="stat-box">
+                    <div class="stat-number" id="count-auto">0</div>
+                    <div class="stat-label">Auto-Approved</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="count-review">0</div>
+                    <div class="stat-label">For Review</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number" id="count-total">0</div>
+                    <div class="stat-label">Total Processed</div>
+                </div>
             </div>
-            <div class="stat-box">
-                <div class="stat-number" id="count-review">0</div>
-                <div class="stat-label">For Review</div>
+
+            <!-- Property Selector -->
+            <div style="margin-bottom: 20px;">
+                <label for="property-selector" style="display: block; font-weight: 600; margin-bottom: 8px; color: #333;">Select Property to Enrich:</label>
+                <select id="property-selector" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                    <option value="">Loading properties...</option>
+                </select>
             </div>
-            <div class="stat-box">
-                <div class="stat-number" id="count-total">0</div>
-                <div class="stat-label">Total Processed</div>
+
+            <!-- Action Buttons -->
+            <div class="button-group">
+                <button class="btn-primary" id="btn-enrich">Start Enrichment (5 Contacts)</button>
+                <button class="btn-secondary" id="btn-reset">Reset</button>
             </div>
         </div>
 
-        <!-- Property Selector -->
-        <div style="margin-bottom: 20px;">
-            <label for="property-selector" style="display: block; font-weight: 600; margin-bottom: 8px; color: #333;">Select Property to Enrich:</label>
-            <select id="property-selector" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
-                <option value="">Loading properties...</option>
-            </select>
-        </div>
+        <!-- Online Sources Enrichment Tab -->
+        <div id="online" class="tab-content">
+            <p style="margin-bottom: 20px; color: #666; font-size: 14px;">Enrich contacts using data from online sources. Select the sources you want to use:</p>
 
-        <!-- Action Buttons -->
-        <div class="button-group">
-            <button class="btn-primary" id="btn-enrich">Start Enrichment (5 Contacts)</button>
-            <button class="btn-secondary" id="btn-reset">Reset</button>
+            <!-- Source Selection -->
+            <div class="sources-grid">
+                <div class="source-card" data-source="linkedin" onclick="toggleSource(this)">
+                    <div class="source-icon">💼</div>
+                    <div class="source-name">LinkedIn</div>
+                    <div class="source-status">Coming Soon</div>
+                </div>
+                <div class="source-card" data-source="company-website" onclick="toggleSource(this)">
+                    <div class="source-icon">🌍</div>
+                    <div class="source-name">Company Website</div>
+                    <div class="source-status">Coming Soon</div>
+                </div>
+                <div class="source-card" data-source="clearbit" onclick="toggleSource(this)">
+                    <div class="source-icon">🔍</div>
+                    <div class="source-name">Clearbit</div>
+                    <div class="source-status">Coming Soon</div>
+                </div>
+                <div class="source-card" data-source="hunter" onclick="toggleSource(this)">
+                    <div class="source-icon">🎯</div>
+                    <div class="source-name">Hunter.io</div>
+                    <div class="source-status">Coming Soon</div>
+                </div>
+                <div class="source-card" data-source="apollo" onclick="toggleSource(this)">
+                    <div class="source-icon">🚀</div>
+                    <div class="source-name">Apollo.io</div>
+                    <div class="source-status">Coming Soon</div>
+                </div>
+                <div class="source-card" data-source="enrichment-api" onclick="toggleSource(this)">
+                    <div class="source-icon">⚡</div>
+                    <div class="source-name">ZoomInfo</div>
+                    <div class="source-status">Coming Soon</div>
+                </div>
+            </div>
+
+            <!-- Property Selector for Online Enrichment -->
+            <div style="margin-bottom: 20px;">
+                <label for="online-property-selector" style="display: block; font-weight: 600; margin-bottom: 8px; color: #333;">Select Properties to Populate:</label>
+                <select id="online-property-selector" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;" multiple>
+                    <option value="">Loading properties...</option>
+                </select>
+                <p style="font-size: 12px; color: #999; margin-top: 5px;">Hold Ctrl/Cmd to select multiple properties</p>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="button-group">
+                <button class="btn-primary" id="btn-online-enrich" disabled>Start Online Enrichment (5 Contacts)</button>
+                <button class="btn-secondary" id="btn-online-reset">Reset</button>
+            </div>
+
+            <!-- Selected Sources Display -->
+            <div id="selected-sources" style="margin-top: 20px; padding: 15px; background: #f9f9f9; border-radius: 8px; display: none;">
+                <p style="font-weight: 600; color: #333; margin-bottom: 10px;">Selected Sources:</p>
+                <div id="sources-list" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
+            </div>
         </div>
 
         <!-- Loading State -->
@@ -325,9 +475,82 @@
 
     <script>
         const API_BASE = "/api";
+        let selectedSources = new Set();
 
         document.getElementById("btn-enrich").addEventListener("click", startEnrichment);
         document.getElementById("btn-reset").addEventListener("click", resetUI);
+        document.getElementById("btn-online-enrich").addEventListener("click", startOnlineEnrichment);
+        document.getElementById("btn-online-reset").addEventListener("click", resetOnlineUI);
+
+        // Tab switching
+        document.querySelectorAll(".tab-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                const tabName = btn.getAttribute("data-tab");
+                switchTab(tabName);
+            });
+        });
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll(".tab-content").forEach(tab => {
+                tab.classList.remove("active");
+            });
+            document.querySelectorAll(".tab-btn").forEach(btn => {
+                btn.classList.remove("active");
+            });
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add("active");
+            document.querySelector(`[data-tab="${tabName}"]`).classList.add("active");
+        }
+
+        function toggleSource(element) {
+            const source = element.getAttribute("data-source");
+            element.classList.toggle("selected");
+
+            if (element.classList.contains("selected")) {
+                selectedSources.add(source);
+            } else {
+                selectedSources.delete(source);
+            }
+
+            updateSelectedSourcesDisplay();
+            updateOnlineEnrichButton();
+        }
+
+        function updateSelectedSourcesDisplay() {
+            const sourcesList = document.getElementById("sources-list");
+            const selectedSourcesDiv = document.getElementById("selected-sources");
+
+            if (selectedSources.size > 0) {
+                selectedSourcesDiv.style.display = "block";
+                sourcesList.innerHTML = Array.from(selectedSources).map(source => {
+                    const card = document.querySelector(`[data-source="${source}"]`);
+                    const name = card.querySelector(".source-name").textContent;
+                    return `<span style="background: #667eea; color: white; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">${name}</span>`;
+                }).join("");
+            } else {
+                selectedSourcesDiv.style.display = "none";
+            }
+        }
+
+        function updateOnlineEnrichButton() {
+            const btn = document.getElementById("btn-online-enrich");
+            btn.disabled = selectedSources.size === 0;
+        }
+
+        async function startOnlineEnrichment() {
+            alert("Online enrichment coming soon! Selected sources: " + Array.from(selectedSources).join(", "));
+        }
+
+        function resetOnlineUI() {
+            selectedSources.clear();
+            document.querySelectorAll(".source-card").forEach(card => {
+                card.classList.remove("selected");
+            });
+            updateSelectedSourcesDisplay();
+            updateOnlineEnrichButton();
+        }
 
         // Load properties on page load
         document.addEventListener("DOMContentLoaded", loadProperties);
@@ -338,9 +561,14 @@
                 const data = await response.json();
 
                 const selector = document.getElementById("property-selector");
-                selector.innerHTML = data.properties.map(prop =>
+                const onlineSelector = document.getElementById("online-property-selector");
+
+                const options = data.properties.map(prop =>
                     `<option value="${prop.name}">${prop.label}</option>`
                 ).join("");
+
+                selector.innerHTML = options;
+                onlineSelector.innerHTML = options;
             } catch (error) {
                 console.error("Error loading properties:", error);
                 alert("Error loading properties: " + error.message);

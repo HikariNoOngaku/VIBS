@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - VIBS CRM Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1E5A96;
+            --primary-light: #3B82F6;
+            --primary-dark: #164077;
+            --secondary: #FF6B35;
+            --bg-light: #F9FAFB;
+            --bg-white: #FFFFFF;
+            --text-dark: #1F2937;
+            --text-gray: #6B7280;
+            --border-color: #D1D5DB;
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: var(--bg-light);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        .container {
+            display: flex;
+            width: 100%;
+        }
+
+        /* Left Side - Branding */
+        .branding-side {
+            flex: 1;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 100vh;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 20px;
+            margin-bottom: 80px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            font-size: 22px;
+        }
+
+        .value-prop {
+            margin-bottom: auto;
+        }
+
+        .value-prop h2 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.3;
+        }
+
+        .value-prop p {
+            font-size: 16px;
+            opacity: 0.9;
+            line-height: 1.6;
+            max-width: 400px;
+        }
+
+        .benefits-list {
+            margin-top: 40px;
+        }
+
+        .benefit-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        .benefit-icon {
+            font-size: 18px;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .footer-text {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-top: 60px;
+        }
+
+        .footer-text a {
+            color: white;
+            text-decoration: underline;
+        }
+
+        /* Right Side - Form */
+        .form-side {
+            flex: 1;
+            background: var(--bg-white);
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .form-header {
+            margin-bottom: 40px;
+        }
+
+        .form-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        .form-header p {
+            font-size: 14px;
+            color: var(--text-gray);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            background: var(--bg-white);
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(30, 90, 150, 0.1);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            accent-color: var(--primary);
+            margin-top: 4px;
+            flex-shrink: 0;
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            font-size: 13px;
+            color: var(--text-gray);
+            cursor: pointer;
+            line-height: 1.5;
+        }
+
+        .checkbox-group a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .checkbox-group a:hover {
+            text-decoration: underline;
+        }
+
+        .button-primary {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .button-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(30, 90, 150, 0.2);
+        }
+
+        .signin-link {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 14px;
+            color: var(--text-gray);
+        }
+
+        .signin-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        .signin-link a:hover {
+            color: var(--primary-light);
+            text-decoration: underline;
+        }
+
+        .form-note {
+            font-size: 12px;
+            color: var(--text-gray);
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .branding-side {
+                min-height: auto;
+                padding: 40px 30px;
+                justify-content: flex-start;
+            }
+
+            .logo {
+                margin-bottom: 40px;
+            }
+
+            .value-prop {
+                margin-bottom: 40px;
+            }
+
+            .value-prop h2 {
+                font-size: 28px;
+            }
+
+            .form-side {
+                padding: 40px 30px;
+                min-height: auto;
+            }
+
+            .benefits-list {
+                margin-top: 24px;
+            }
+
+            .benefit-item {
+                margin-bottom: 12px;
+                font-size: 13px;
+            }
+
+            .footer-text {
+                margin-top: 40px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .branding-side {
+                padding: 30px 20px;
+            }
+
+            .form-side {
+                padding: 30px 20px;
+            }
+
+            .form-container {
+                max-width: 100%;
+            }
+
+            .form-header h1 {
+                font-size: 24px;
+            }
+
+            .value-prop h2 {
+                font-size: 22px;
+            }
+
+            .value-prop p {
+                font-size: 14px;
+            }
+
+            .logo {
+                margin-bottom: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Left Side - Branding -->
+        <div class="branding-side">
+            <div>
+                <div class="logo">
+                    <div class="logo-icon">▲</div>
+                    <span>VIBS</span>
+                </div>
+
+                <div class="value-prop">
+                    <h2>Start Enriching in Minutes</h2>
+                    <p>Join sales teams using AI to qualify leads and enrich their HubSpot database.</p>
+
+                    <div class="benefits-list">
+                        <div class="benefit-item">
+                            <div class="benefit-icon">⚡</div>
+                            <div>Instant contact enrichment</div>
+                        </div>
+                        <div class="benefit-item">
+                            <div class="benefit-icon">✅</div>
+                            <div>99% accurate data</div>
+                        </div>
+                        <div class="benefit-item">
+                            <div class="benefit-icon">🔄</div>
+                            <div>Bulk processing (10K+)</div>
+                        </div>
+                        <div class="benefit-item">
+                            <div class="benefit-icon">💳</div>
+                            <div>No credit card needed</div>
+                        </div>
+                        <div class="benefit-item">
+                            <div class="benefit-icon">🔒</div>
+                            <div>Enterprise security</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-text">
+                Already have an account? <a href="/login">Sign in</a>
+            </div>
+        </div>
+
+        <!-- Right Side - Form -->
+        <div class="form-side">
+            <div class="form-container">
+                <div class="form-header">
+                    <h1>Create Your Account</h1>
+                    <p>Get started with VIBS in less than 2 minutes</p>
+                </div>
+
+                <form onsubmit="handleSignup(event)">
+                    <div class="form-group">
+                        <label for="name">Full Name</label>
+                        <input type="text" id="name" placeholder="John Doe" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" placeholder="you@company.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="company">Company Name</label>
+                        <input type="text" id="company" placeholder="Your Company" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" placeholder="Create a strong password" required>
+                    </div>
+
+                    <div class="form-note">
+                        Password must be at least 8 characters
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="terms" name="terms" required>
+                        <label for="terms">I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
+                    </div>
+
+                    <button type="submit" class="button-primary">Create Account</button>
+                </form>
+
+                <div class="signin-link">
+                    Already have an account? <a href="/login">Sign in</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function handleSignup(event) {
+            event.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const company = document.getElementById('company').value;
+            const terms = document.getElementById('terms').checked;
+
+            // Validate password length
+            if (password.length < 8) {
+                alert('Password must be at least 8 characters');
+                return;
+            }
+
+            if (!terms) {
+                alert('You must agree to the Terms of Service and Privacy Policy');
+                return;
+            }
+
+            // Get existing users or create new list
+            const users = JSON.parse(localStorage.getItem('vibs_users') || '[]');
+
+            // Check if email already exists
+            if (users.some(u => u.email === email)) {
+                alert('An account with this email already exists. Please sign in instead.');
+                return;
+            }
+
+            // Add new user to the list
+            users.push({
+                email: email,
+                password: password,
+                name: name,
+                company: company
+            });
+
+            localStorage.setItem('vibs_users', JSON.stringify(users));
+            localStorage.setItem('vibs_user', email);
+            localStorage.setItem('vibs_user_name', name);
+            localStorage.setItem('vibs_auth', 'true');
+            localStorage.setItem('vibs_current_user', email);
+
+            // Show success message and redirect
+            alert(`Welcome, ${name}! Your account has been created. Redirecting to dashboard...`);
+            window.location.href = '/';
+        }
+
+        // Check if user is already logged in on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            if (localStorage.getItem('vibs_auth') === 'true') {
+                window.location.href = '/';
+            }
+        });
+    </script>
+</body>
+</html>

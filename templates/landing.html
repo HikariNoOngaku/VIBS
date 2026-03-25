@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIBS - AI-Powered Contact Enrichment for HubSpot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1E5A96;
+            --primary-light: #3B82F6;
+            --primary-dark: #0F3460;
+            --accent: #FF6B35;
+            --accent-light: #FF8C42;
+            --text-dark: #0F172A;
+            --text-gray: #475569;
+            --text-light: #94A3B8;
+            --bg-white: #FFFFFF;
+            --bg-light: #F8FAFC;
+            --bg-dark: #0F172A;
+            --border: #E2E8F0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
+            color: var(--text-dark);
+            background: var(--bg-white);
+            overflow-x: hidden;
+        }
+
+        /* HEADER */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: -1px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo span {
+            font-size: 28px;
+        }
+
+        nav {
+            display: flex;
+            gap: 40px;
+            align-items: center;
+        }
+
+        nav a {
+            font-size: 14px;
+            color: var(--text-gray);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: var(--primary);
+        }
+
+        .cta-header {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-signin {
+            padding: 10px 20px;
+            background: transparent;
+            color: var(--primary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .btn-signin:hover {
+            background: var(--bg-light);
+            border-color: var(--primary);
+        }
+
+        .btn-start {
+            padding: 10px 24px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .btn-start:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(30, 90, 150, 0.3);
+        }
+
+        /* HERO SECTION */
+        .hero {
+            margin-top: 80px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(30, 90, 150, 0.1), transparent);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(255, 107, 53, 0.08), transparent);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        .hero h1 {
+            font-size: 72px;
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 24px;
+            letter-spacing: -2px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .hero p {
+            font-size: 20px;
+            color: var(--text-gray);
+            margin-bottom: 48px;
+            line-height: 1.6;
+            animation: fadeInUp 0.8s ease-out 0.1s backwards;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.8s ease-out 0.2s backwards;
+        }
+
+        .btn-primary {
+            padding: 16px 40px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 8px 24px rgba(30, 90, 150, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(30, 90, 150, 0.3);
+        }
+
+        .btn-secondary {
+            padding: 16px 40px;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            background: var(--bg-white);
+        }
+
+        .hero-image {
+            margin-top: 80px;
+            aspect-ratio: 16 / 10;
+            background: linear-gradient(135deg, var(--bg-light), #E0E7FF);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: var(--text-gray);
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            animation: fadeInUp 0.8s ease-out 0.3s backwards;
+        }
+
+        /* FEATURES SECTION */
+        .features {
+            padding: 120px 40px;
+            background: var(--bg-light);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .section-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--accent);
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .section-header h2 {
+            font-size: 52px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            letter-spacing: -1px;
+        }
+
+        .section-header p {
+            font-size: 18px;
+            color: var(--text-gray);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 32px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .feature-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-8px);
+            box-shadow: 0 16px 40px rgba(30, 90, 150, 0.12);
+        }
+
+        .feature-icon {
+            font-size: 40px;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .feature-card p {
+            color: var(--text-gray);
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        /* STATS SECTION */
+        .stats {
+            padding: 120px 40px;
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            color: white;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 60px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 56px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            letter-spacing: -1px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        /* INTEGRATION SECTION */
+        .integrations {
+            padding: 120px 40px;
+            text-align: center;
+        }
+
+        .integrations h2 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .integrations p {
+            font-size: 18px;
+            color: var(--text-gray);
+            margin-bottom: 60px;
+        }
+
+        .integration-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 32px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-weight: 600;
+            color: var(--text-dark);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        /* CTA SECTION */
+        .cta {
+            padding: 120px 40px;
+            background: linear-gradient(135deg, rgba(30, 90, 150, 0.05), rgba(255, 107, 53, 0.05));
+        }
+
+        .cta-content {
+            max-width: 700px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .cta h2 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .cta p {
+            font-size: 18px;
+            color: var(--text-gray);
+            margin-bottom: 40px;
+        }
+
+        .email-form {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .email-form input {
+            flex: 1;
+            min-width: 200px;
+            padding: 14px 20px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .email-form input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(30, 90, 150, 0.1);
+        }
+
+        .email-form button {
+            padding: 14px 32px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .email-form button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(30, 90, 150, 0.2);
+        }
+
+        .cta-note {
+            font-size: 13px;
+            color: var(--text-light);
+        }
+
+        /* FOOTER */
+        footer {
+            background: var(--bg-dark);
+            color: white;
+            padding: 60px 40px 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto 60px;
+        }
+
+        .footer-column h4 {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .footer-column a {
+            display: block;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            margin-bottom: 12px;
+            transition: color 0.3s;
+        }
+
+        .footer-column a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+            text-align: center;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.5);
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* ANIMATIONS */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            header {
+                padding: 12px 20px;
+            }
+
+            .logo {
+                font-size: 18px;
+            }
+
+            nav {
+                display: none;
+            }
+
+            .hero {
+                margin-top: 60px;
+                padding: 40px 20px;
+                min-height: auto;
+            }
+
+            .hero h1 {
+                font-size: 36px;
+                margin-bottom: 16px;
+            }
+
+            .hero p {
+                font-size: 16px;
+                margin-bottom: 32px;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .btn-primary, .btn-secondary {
+                width: 100%;
+            }
+
+            .section-header h2 {
+                font-size: 32px;
+            }
+
+            .features {
+                padding: 60px 20px;
+            }
+
+            .stats {
+                padding: 60px 20px;
+            }
+
+            .cta {
+                padding: 60px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <header>
+        <a href="/" class="logo">
+            <span>▲</span>
+            VIBS
+        </a>
+        <nav>
+            <a href="#features">Features</a>
+            <a href="#pricing">Pricing</a>
+            <a href="#docs">Docs</a>
+            <a href="#contact">Contact</a>
+        </nav>
+        <div class="cta-header">
+            <button class="btn-signin">Sign In</button>
+            <button class="btn-start">Start Free</button>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Enrich HubSpot Contacts with AI</h1>
+            <p>Auto-populate missing fields, verify data, and qualify leads in seconds. Powered by Claude AI. No manual work. No errors.</p>
+            <div class="hero-buttons">
+                <button class="btn-primary">Start for Free</button>
+                <button class="btn-secondary">→ Watch Demo</button>
+            </div>
+            <div class="hero-image">[Dashboard Preview with Real-time Enrichment]</div>
+        </div>
+    </section>
+
+    <!-- FEATURES SECTION -->
+    <section class="features" id="features">
+        <div class="section-header">
+            <div class="section-label">Capabilities</div>
+            <h2>Everything you need to enrich</h2>
+            <p>Powerful features designed to scale your contact enrichment to thousands of contacts per month</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3>1-Click Enrichment</h3>
+                <p>Enrich single contacts or batch upload thousands. AI handles the heavy lifting in seconds.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Confidence Scoring</h3>
+                <p>Every enriched field includes a confidence score. Auto-approve high-confidence suggestions.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔄</div>
+                <h3>Batch Processing</h3>
+                <p>Process 10K+ contacts in one batch. Set it and forget it while AI works in the background.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3>Smart Deduplication</h3>
+                <p>Never enrich the same contact twice. Automatic duplicate detection and prevention.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📈</div>
+                <h3>Progress Tracking</h3>
+                <p>Real-time enrichment analytics. See exactly how much of your database has been enriched.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💳</div>
+                <h3>Credit-Based Pricing</h3>
+                <p>Pay only for what you use. 1 credit = 1 contact. No hidden fees or surprises.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- STATS SECTION -->
+    <section class="stats">
+        <div class="stats-grid">
+            <div class="stat">
+                <div class="stat-number">99%</div>
+                <div class="stat-label">Accuracy Rate</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">10K+</div>
+                <div class="stat-label">Contacts/Month</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">30s</div>
+                <div class="stat-label">Per Contact</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">$0</div>
+                <div class="stat-label">Setup Fee</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- INTEGRATION SECTION -->
+    <section class="integrations">
+        <h2>Built for HubSpot</h2>
+        <p>Seamless integration with your existing HubSpot workspace. No API required.</p>
+        <div class="integration-badge">
+            <span style="font-size: 24px;">🎯</span>
+            HubSpot CRM
+        </div>
+    </section>
+
+    <!-- CTA SECTION -->
+    <section class="cta" id="contact">
+        <div class="cta-content">
+            <h2>Ready to enrich your contacts?</h2>
+            <p>Join thousands of teams using VIBS to qualify leads and populate missing data in HubSpot.</p>
+            <div class="email-form">
+                <input type="email" placeholder="Enter your email">
+                <button>Get Started</button>
+            </div>
+            <p class="cta-note">No credit card required • 500 free credits to start</p>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-column">
+                <h4>Product</h4>
+                <a href="#">Features</a>
+                <a href="#">Pricing</a>
+                <a href="#">Security</a>
+                <a href="#">Roadmap</a>
+            </div>
+            <div class="footer-column">
+                <h4>Resources</h4>
+                <a href="#">Documentation</a>
+                <a href="#">API Docs</a>
+                <a href="#">Guides</a>
+                <a href="#">Blog</a>
+            </div>
+            <div class="footer-column">
+                <h4>Company</h4>
+                <a href="#">About</a>
+                <a href="#">Careers</a>
+                <a href="#">Contact</a>
+                <a href="#">Status</a>
+            </div>
+            <div class="footer-column">
+                <h4>Legal</h4>
+                <a href="#">Privacy</a>
+                <a href="#">Terms</a>
+                <a href="#">Cookie Policy</a>
+                <a href="#">Compliance</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 VIBS CRM Assistant. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Navigation handlers for landing page buttons
+        document.addEventListener('DOMContentLoaded', function() {
+            // Header Sign In button
+            const signInBtn = document.querySelector('.btn-signin');
+            if (signInBtn) {
+                signInBtn.addEventListener('click', () => window.location.href = '/login');
+            }
+
+            // Header Start Free button
+            const headerStartBtn = document.querySelector('.btn-start');
+            if (headerStartBtn) {
+                headerStartBtn.addEventListener('click', () => window.location.href = '/signup');
+            }
+
+            // Hero section "Start for Free" button
+            const heroStartBtn = document.querySelector('.btn-primary');
+            if (heroStartBtn) {
+                heroStartBtn.addEventListener('click', () => window.location.href = '/signup');
+            }
+
+            // CTA section "Get Started" button
+            const ctaButtons = document.querySelectorAll('button');
+            ctaButtons.forEach(btn => {
+                if (btn.textContent.trim() === 'Get Started') {
+                    btn.addEventListener('click', () => window.location.href = '/signup');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

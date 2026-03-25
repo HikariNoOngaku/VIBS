@@ -1,0 +1,203 @@
+,20260319 CRM Taxonomy CANON V1,,,,,,,,,
+,"This CANON file combines (1) Customer Intelligence Taxonomy properties used for targeting and segmentation. Geography should use HubSpot native location fields (Country, State/Region, City); no custom region dropdown is included in V1. (2) current / legacy CRM contact properties used to store operational customer data and ",,,,,,,,,
+,,,,,,,,,,
+,SECTION 1 — CUSTOMER INTELLIGENCE TAXONOMY (Targeting / Segmentation Use),,,,,,,,,
+,Section / Purpose,Layer,Record Type,Property Label,Internal Name,Field Type,Property Group,Options,Description,Notes / Current Use
+,Targeting / segmentation,L1,Company,Organization Type (Inferred) [L1],org_type_l1,Dropdown,Customer Intelligence Taxonomy,"Builder
+Developer
+Builder-Developer
+Architecture Firm
+Design/Drafting Firm
+Planning Firm
+Municipality / Approving Authority
+Mixed",Inferred organization type based on public data or enrichment.,New proposed property
+,Targeting / segmentation,L1,Company,Company Scale (Inferred) [L1],company_scale_l1,Dropdown,Customer Intelligence Taxonomy,"Small
+Medium
+Large",Inferred company size based on projects/year or employee count.,New proposed property
+,Targeting / segmentation,L1,Company,Subdivision Activity (Inferred) [L1],subdivision_activity_l1,Dropdown,Customer Intelligence Taxonomy,"Low
+Moderate
+High",Estimated level of subdivision-related activity.,New proposed property
+,Targeting / segmentation,L1,Contact,Role (Inferred) [L1],role_inferred_l1,Dropdown,Customer Intelligence Taxonomy,"Sales
+Marketing
+Design/Drafting
+Planning/Development
+Executive
+Approval Submission
+Approval Processing","Inferred contact role based on job title, LinkedIn, or enrichment.",New proposed property
+,Targeting / segmentation,L2,Company,Organization Type [L2],org_type_l2,Dropdown,Customer Intelligence Taxonomy,"Builder
+Developer
+Builder-Developer
+Architecture Firm
+Design/Drafting Firm
+Planning Firm
+Municipality / Approving Authority
+Mixed",Confirmed organization type provided by the user.,New proposed property
+,Targeting / segmentation,L2,Company,Company Scale [L2],company_scale_l2,Dropdown,Customer Intelligence Taxonomy,"Small
+Medium
+Large",Confirmed company scale provided by the user.,New proposed property
+,Targeting / segmentation,L2,Company,Subdivision Involvement [L2],subdivision_involvement_l2,Dropdown,Customer Intelligence Taxonomy,"Low
+Moderate
+High",Confirmed percentage of work involving subdivision projects.,New proposed property
+,Targeting / segmentation,L2,Contact,Role [L2],role_l2,Dropdown,Customer Intelligence Taxonomy,"Sales
+Marketing
+Design/Drafting
+Planning/Development
+Executive
+Approval Submission
+Approval Processing",Confirmed contact role provided by the user.,New proposed property
+,Targeting / segmentation,L2,Contact,Primary Workflow Context [L2],workflow_context_l2,Dropdown,Customer Intelligence Taxonomy,"Urban Planning
+Development Management
+Product Design
+Approval Submission
+Approval Processing
+Sales/Presale
+Sales/Inventory
+Portfolio/Marketing
+Construction/Production
+Mixed/Unknown","Primary workflow context used for routing, messaging, and targeting.",New proposed property
+,Targeting / segmentation,L2,Contact,Secondary Workflow Context [L2],secondary_workflow_context_l2,Dropdown,Customer Intelligence Taxonomy,"Urban Planning
+Development Management
+Product Design
+Approval Submission
+Approval Processing
+Sales/Presale
+Sales/Inventory
+Portfolio/Marketing
+Construction/Production
+Mixed/Unknown",Optional secondary workflow context if the contact spans multiple functions.,New proposed property
+,SECTION 2 — CURRENT / LEGACY CRM CONTACT PROPERTIES (Data Storage / Operational Use),,,,,,,,,
+,HUBSPOT'S MOST USED DEFAULT PROPERTIES,,,,,,,,,
+,Section / Purpose,Layer,Record Type,Property Label,Internal Name,Field Type,Property Group,Options,Description,Notes / Current Use
+,Legacy / data storage,,Contact,Lifecycle Stage,lifecyclestage,enumeration,contactinformation,,"The qualification of contacts to sales readiness. It can be set through imports, forms, workflows, and manually on a per contact basis.","Fill rate: 99.66%
+Usages: Automation platform flow (1); Report (1); Properties v3 card (1)"
+,Legacy / data storage,,Contact,First Name,firstname,string,contactinformation,,A contact's first name,"Fill rate: 97.97%
+Usages: Form (15); Bot (1); Automation platform flow (2); Object requirement (1); Email (7); Data sync mapping (2); Customer agent (2)"
+,Legacy / data storage,,Contact,Email,email,string,contactinformation,,A contact's email address,"Fill rate: 90.63%
+Usages: Form (17); Bot (1); Automation platform flow (2); Object requirement (1); Data sync mapping (2); Sales view (7); Properties v3 card (1)"
+,Legacy / data storage,,Contact,Last Name,lastname,string,contactinformation,,A contact's last name,"Fill rate: 84.70%
+Usages: Form (15); Bot (1); Automation platform flow (2); Object requirement (1); Data sync mapping (2)"
+,Legacy / data storage,,Contact,Company Name,company,string,contactinformation,,Name of the contact's company. This can be set independently from the name property on the contact's associated company.,"Fill rate: 76.23%
+Usages: Form (2); Automation platform flow (2); Sales view (1); Properties v3 card (1)"
+,Legacy / data storage,,Contact,Job Title,jobtitle,string,contactinformation,,A contact's job title,"Fill rate: 51.99%
+Usages: Form (2); Inbounddb lists (1); Automation platform flow (2); Object requirement (1); Report (1); Data sync mapping (2); Sales view (1)"
+,Legacy / data storage,,Contact,Website URL,website,string,contactinformation,,Associated company website.,"Fill rate: 24.63%
+Usages: Data sync mapping (2)"
+,Legacy / data storage,,Contact,Phone Number,phone,string,contactinformation,,A contact's primary phone number,"Fill rate: 21.06%
+Usages: Form (5); Object requirement (1); Data sync mapping (2); Sales view (6); Properties v3 card (1)"
+,Legacy / data storage,,Contact,City,city,string,contactinformation,,A contact's city of residence,Fill rate: 17.90%
+,Legacy / data storage,,Contact,Street Address,address,string,contactinformation,,"Contact's street address, including apartment or unit number.","Fill rate: 14.22%
+Usages: Properties v3 card (1)"
+,Legacy / data storage,,Contact,State/Region,state,string,contactinformation,,"The contact's state of residence. This might be set via import, form, or integration.","Fill rate: 10.57%
+Usages: Properties v3 card (1)"
+,Legacy / data storage,,Contact,Country,Country,string,contactinformation,,,"Fill rate: 10.57%
+Usages: Properties v3 card (1)"
+,FIRST SEGMENTATION ROUND February 2026,,,,,,,,,
+,Section / Purpose,Layer,Record Type,Property Label,Internal Name,Field Type,Property Group,Options,Description,Notes / Current Use
+,Legacy / data storage,Contact,Contact,SEG operatingProvince,operatingprovince,string,seg_columns_,,Province of business,
+,Legacy / data storage,Contact,Contact,SEG Customer Segment,seg_customer_segment,enumeration,seg_columns_,"
+Builder - Enterprise (builder__enterprise)
+Builder - Production (builder__production)
+Builder - Small (builder__small)
+Developer - Enterprise (developer__enterprise)
+Developer - Midmarket (developer__midmarket)
+Developer - Small (developer__small)
+Capital (capital)
+ConsultA (consulta)
+ConsultD (consultd)
+ConsultE (consulte)
+ConsultL (consultl)
+ConsultM (consultm)
+ConsultP (consultp)
+ConsultS (consults)
+ConsultSC (consultsc)
+DevComm (devcomm)
+DevMulti (devmulti)
+DevRes (devres)
+DevResSM (devressm)
+Edu (edu)
+GovCity (govcity)
+GovMetro (govmetro)
+GovTown (govtown)
+HIDE (hide)
+HOA (hoa)
+Media (media)
+Other (other)
+Real (real)
+Software (software)
+Trade (trade)
+Vendor (vendor)
+",,
+,Legacy / data storage,Contact,Contact,SEG email type,seg_email_type,enumeration,seg_columns_,personal email (personal); corporate email (corporate),,
+,Legacy / data storage,Contact,Contact,SEG Engagement Tier,seg_engagement_tier,enumeration,seg_columns_,Beta (beta); Basic (basic),,
+,Legacy / data storage,Contact,Contact,SEG linkedin profile URL,seg_linkedin_profile_url,string,seg_columns_,,,
+,Legacy / data storage,Contact,Contact,SEG Mailing Programs,seg_mailing_programs,enumeration,seg_columns_,"E2 AC (e2_ac)
+Streetscape (streetscape)
+Dirt (dirt)
+212 Group (p_212_group)
+Atenta (atenta)
+E2 Studio (e2_studio)
+StudioX (studiox)
+StudioX Beta (studiox_beta)
+StudioX VIP (studiox_vip)
+StudioX Ultra VIP (studiox_ultra_vip)
+Gingercane (gingercane)
+Breakfast Sessions (breakfast_sessions)",,
+,Legacy / data storage,Contact,Contact,SEG Product / Service Interest,seg_product_interest,enumeration,seg_columns_,"StudioX (studiox)
+Streetscape (streetscape)
+Approvals (approvals)
+Revisions (revisions)
+Portfolio Reviews (portfolio_reviews)
+Inspections (inspections)
+Controls Advisory (controls_advisory)",,
+,Legacy / data storage,Contact,Contact,SEG Role,seg_standardized_role,enumeration,seg_columns_,"Executive (executive)
+Sales (sales)
+Design & Drafting (design_drafting)
+Drafting (drafting)
+Architectural Controls (architectural_controls)
+Marketing (marketing)
+Administration & Finance (administration_finance)
+Development (development)
+Construction (construction)
+Planning (planning)
+Engineering (engineering)
+Other (other)",,
+,Legacy / data storage,Contact,Contact,SEG Contact Status,seg_strategic_contact_status,enumeration,seg_columns_,"Unfavourable (unfavourable)
+Competitor (competitor)
+Contact (contact)
+Partner (partner)
+Client (client)
+Prospect (prospect)
+StudioX VIP Beta (studiox_vip_beta)
+Internal (internal)
+Other (other)",,
+,Legacy / data storage,Contact,Contact,SEG Lead Status,segleadstatus,enumeration,seg_columns_,"ULTRA VIP (ultra_vip)
+VIP – Shannon’s Lead (vip__shannons_lead)
+VIP – Pat Lead (vip__pat_lead)
+VIP – Rod Lead (vip__rod_lead)
+Internal (internal)",,
+,Legacy / data storage,Contact,Contact,SEG Importance,topgradeimportance,string,seg_columns_,,How valuable contact is,
+,STUDIOX DEVELOPMENT WEBSITE PROPERTIES,,,,,,,,,
+,Section / Purpose,Layer,Record Type,Property Label,Internal Name,Field Type,Property Group,Options,Description,Notes / Current Use
+,Legacy / data storage,Contact,Contact,Builder Custom Percentage,builder_custom_percentage,number,ssx_data,,,
+,Legacy / data storage,Contact,Contact,Business Type,business_type,enumeration,ssx_data,"Builder (builder)
+Land developer (land_developer)
+Designer (designer)
+Architect Engineer (architect_engineer)
+Consultant (consultant)",,
+,Legacy / data storage,Contact,Contact,Designation,designation,enumeration,ssx_data,"Sales (sales)
+Marketing (marketing)
+Design (design)
+Management (management)
+Other (other)",,
+,Legacy / data storage,Contact,Contact,Marketing Opt In,marketing_opt_in,bool,ssx_data,Yes (true); No (false),,
+,Legacy / data storage,Contact,Contact,Project Completion,project_completion,enumeration,ssx_data,"1-50 (1_50)
+51-100 (51_100)
+101-499 (101_499)
+500+ (500_plus)",,
+,Legacy / data storage,Contact,Contact,Registration Source,registration_source,string,ssx_data,,,
+,Legacy / data storage,Contact,Contact,SSX Last Login,ssx_last_login,date,ssx_data,,,
+,Legacy / data storage,Contact,Contact,SSX Whitelist,ssx_whitelist,bool,ssx_data,Yes (true); No (false),,
+,,,,,,,,,,
+,,,,,,,,,,
+,Document location:,,,,,,,,,
+,X:\Shared drives\E2 + Associates\Marketing\Campaigns\Crmhubspot\20260320 CRM Taxonomy CANON V1.xls,,,,,,,,,

@@ -11,121 +11,675 @@
             box-sizing: border-box;
         }
 
+        :root {
+            /* Testing Mode: Cool Blue Palette (Professional) */
+            --primary: #1E5A96;
+            --primary-light: #3B82F6;
+            --accent: #60A5FA;
+            --text-primary: #1a1a1a;
+            --text-secondary: #666;
+            --bg-light: #EBF2FF;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --text-primary: #1a1a1a;
+            --text-secondary: #666;
+        }
+
+        body.action-mode {
+            /* Action Mode: Warm Palette (Orange → Red) */
+            --primary: #FF6B35 !important;
+            --primary-light: #FF8C42 !important;
+            --accent: #FFD60A !important;
+            --bg-light: #FFF8E8 !important;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
+            background: var(--bg-light);
             min-height: 100vh;
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 18px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
             display: flex;
             align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .container {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 900px;
-            width: 100%;
-            padding: 40px;
-        }
-
-        h1 {
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 28px;
-        }
-
-        .subtitle {
-            color: #666;
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
-
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .stat-box {
-            background: #f5f5f5;
-            padding: 15px;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 24px;
-            font-weight: bold;
-            color: #667eea;
-        }
-
-        .stat-label {
-            font-size: 12px;
-            color: #999;
-            margin-top: 5px;
+            gap: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: 1px;
             text-transform: uppercase;
         }
 
-        .button-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
+        .logo svg {
+            width: 28px;
+            height: 28px;
+            flex-shrink: 0;
         }
 
-        button {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 600;
+        .header-right {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .mode-badge {
+            padding: 8px 16px;
+            background: white;
+            color: var(--primary);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s;
+        }
+
+        body.action-mode .mode-badge {
+            color: #1a1a1a;
+            background: var(--accent-action);
+        }
+
+        .changes-counter {
+            padding: 8px 16px;
+            background: var(--primary);
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .credits-display {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #6366F1, #8B5CF6);
+            color: white;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            border-radius: 4px;
+        }
+
+        /* Main Layout */
+        .main-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 40px;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 40px;
+            flex: 1;
+            width: 100%;
+        }
+
+        @media (max-width: 1024px) {
+            .main-container {
+                grid-template-columns: 1fr;
+                padding: 20px;
+                gap: 20px;
+            }
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+            height: fit-content;
+            position: sticky;
+            top: 80px;
+        }
+
+        .sidebar-section {
+            margin-bottom: 35px;
+        }
+
+        .sidebar-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .sidebar-title {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .mode-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .mode-option {
+            display: flex;
+            align-items: center;
+            padding: 14px;
+            background: #f5f5f5;
             cursor: pointer;
             transition: all 0.3s;
         }
 
-        .btn-primary {
-            background: #667eea;
-            color: white;
+        .mode-option:hover {
+            background: #efefef;
+        }
+
+        .mode-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            margin-right: 12px;
+            accent-color: var(--primary);
+        }
+
+        .mode-option label {
+            cursor: pointer;
             flex: 1;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+            background: white;
+            color: var(--text-primary);
+            transition: all 0.3s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 2px 6px rgba(30, 90, 150, 0.15);
+        }
+
+        .search-input::placeholder {
+            color: #999;
+        }
+
+        .property-help {
+            display: block;
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 6px;
+            line-height: 1.4;
+        }
+
+        .property-selector {
+            position: relative;
+        }
+
+        .custom-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+            z-index: 1000;
+            max-height: 320px;
+            overflow-y: auto;
+            margin-top: 4px;
+        }
+
+        .dropdown-content {
+            padding: 8px 0;
+        }
+
+        .property-section {
+            border-bottom: 2px solid #e8e8e8;
+        }
+
+        .property-section:last-child {
+            border-bottom: none;
+        }
+
+        .property-section-title {
+            padding: 10px 16px;
+            font-weight: 700;
+            font-size: 9px;
+            text-transform: uppercase;
+            color: var(--primary);
+            letter-spacing: 1px;
+            background: rgba(30, 90, 150, 0.04);
+            margin: 0;
+        }
+
+        .property-layer {
+            padding: 4px 0;
+        }
+
+        .property-layer-title {
+            padding: 8px 16px 4px 32px;
+            font-weight: 600;
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
+            margin: 0;
+        }
+
+        .property-group {
+            padding: 4px 0;
+        }
+
+        .property-group-title {
+            padding: 6px 16px 4px 32px;
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
+            margin: 0;
+        }
+
+        .property-option {
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: all 0.15s;
+            border-left: 3px solid transparent;
+        }
+
+        .property-option:hover {
+            background: var(--bg-light);
+            border-left-color: var(--primary);
+        }
+
+        .property-option-name {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-primary);
+        }
+
+        .property-option-label {
+            font-size: 10px;
+            color: var(--text-secondary);
+            margin-top: 1px;
+            font-weight: 400;
+        }
+
+        .property-option.selected {
+            background: var(--bg-light);
+            border-left-color: var(--primary);
+            font-weight: 600;
+        }
+
+        .dropdown-empty {
+            padding: 16px;
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        .sources-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .source-item {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 10px 12px;
+            border-radius: 6px;
+            background: white;
+            border: 1px solid #e5e5e5;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .source-item:hover {
+            background: var(--bg-light);
+            border-color: var(--primary);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .source-item input[type="checkbox"] {
+            cursor: pointer;
+            accent-color: var(--primary);
+            flex-shrink: 0;
+            width: 16px;
+            height: 16px;
+        }
+
+        .source-item input[type="checkbox"]:checked {
+            accent-color: var(--primary-light);
+        }
+
+        .source-item label {
+            cursor: pointer;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            margin: 0;
+        }
+
+        .source-name {
+            font-weight: 600;
+            font-size: 12px;
+            color: var(--text-primary);
+            letter-spacing: 0.3px;
+        }
+
+        .source-desc {
+            font-size: 10px;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .property-selector {
+            margin-bottom: 20px;
+        }
+
+        .property-selector label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+            font-size: 13px;
+        }
+
+        .property-selector select {
+            width: 100%;
+            padding: 12px 14px;
+            background: white;
+            color: var(--text-primary);
+            font-size: 13px;
+            transition: all 0.3s;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .property-selector select:hover {
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+        }
+
+        .property-selector select:focus {
+            outline: none;
+            box-shadow: 0 2px 6px rgba(34, 184, 92, 0.2);
+        }
+
+        /* Enrichment Progress Indicator */
+        .progress-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .progress-bar-container {
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light));
+            border-radius: 4px;
+            transition: width 0.4s ease;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: -20px;
+            right: 0;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .progress-stats {
+            font-size: 11px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .batch-control {
+            background: #f9f9f9;
+            padding: 16px;
+            border-radius: 6px;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #ddd;
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+            margin-bottom: 12px;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .slider::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .batch-info {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .credit-cost {
+            font-size: 12px;
+            color: var(--text-secondary);
+            padding-top: 8px;
+            border-top: 1px solid #ddd;
+            font-weight: 600;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            flex-direction: column;
+        }
+
+        button {
+            padding: 12px 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            width: 100%;
+            border: none;
         }
 
         .btn-primary:hover {
-            background: #5568d3;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4);
+            background: var(--primary-light);
+            box-shadow: 0 4px 12px rgba(42, 157, 143, 0.3);
+        }
+
+        body.action-mode .btn-primary {
+            background: #FF6B35 !important;
+            color: white !important;
+        }
+
+        body.action-mode .btn-primary:hover {
+            background: #FF8C42 !important;
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3) !important;
         }
 
         .btn-primary:disabled {
             background: #ccc;
             cursor: not-allowed;
-            transform: none;
         }
 
         .btn-secondary {
-            background: #f0f0f0;
-            color: #333;
+            background: white;
+            color: var(--text-primary);
+            width: 100%;
+            border: none;
         }
 
         .btn-secondary:hover {
-            background: #e0e0e0;
+            background: #f9fbfd;
         }
 
+        .btn-danger {
+            background: white;
+            color: var(--accent);
+            width: 100%;
+            border: none;
+        }
+
+        .btn-danger:hover {
+            background: #f9fbfd;
+        }
+
+        /* Main Content */
+        .content {
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .content-header {
+            background: white;
+            padding: 40px;
+            border-bottom: none;
+        }
+
+        .content-header h2 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .content-header p {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .content-body {
+            padding: 40px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 50px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+        }
+
+        .stat-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        /* Loading */
         .loading {
             display: none;
+            padding: 80px 40px;
             text-align: center;
-            margin: 20px 0;
         }
 
         .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
+            border: 3px solid #e0e0e0;
+            border-top: 3px solid var(--accent);
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
+            width: 50px;
+            height: 50px;
             animation: spin 1s linear infinite;
-            margin: 0 auto;
+            margin: 0 auto 30px;
         }
 
         @keyframes spin {
@@ -134,480 +688,933 @@
         }
 
         .loading-text {
-            margin-top: 10px;
-            color: #666;
-            font-size: 14px;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 8px;
         }
 
+        .loading-subtext {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #e0e0e0;
+            overflow: hidden;
+            margin-bottom: 40px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .stages-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .stage-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 14px;
+            background: #f5f5f5;
+            transition: all 0.3s;
+        }
+
+        .stage-item.completed {
+            background: #E8F7F5;
+        }
+
+        .stage-item.active {
+            background: #E8F7F5;
+        }
+
+        body.action-mode .stage-item.completed,
+        body.action-mode .stage-item.active {
+            background: #FFF8E8;
+        }
+
+        .stage-icon {
+            font-size: 20px;
+        }
+
+        .stage-text {
+            flex: 1;
+            font-weight: 500;
+            font-size: 13px;
+            color: var(--text-primary);
+        }
+
+        .stage-item.pending .stage-text {
+            color: var(--text-secondary);
+            opacity: 0.7;
+        }
+
+        /* Results */
         .results {
             display: none;
         }
 
         .section {
-            margin-bottom: 30px;
+            margin-bottom: 50px;
         }
 
-        .section-title {
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
             font-size: 16px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
+            font-weight: 700;
+            color: var(--primary);
         }
 
-        .badge {
-            display: inline-block;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 600;
-            margin-left: 10px;
+        .section-badge {
+            padding: 6px 12px;
+            font-size: 10px;
+            font-weight: 700;
+            background: white;
+            color: var(--accent);
+            text-transform: uppercase;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
         }
 
-        .badge-auto {
-            background: #d4edda;
-            color: #155724;
+        /* Contact Cards */
+        .contacts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 20px;
         }
 
-        .badge-review {
-            background: #fff3cd;
-            color: #856404;
+        .contact-card {
+            background: white;
+            padding: 25px;
+            transition: all 0.3s;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
         }
 
-        .badge-warning {
-            background: #f8d7da;
-            color: #721c24;
+        .contact-card:hover {
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
         }
 
-        .contact-item {
-            background: #f9f9f9;
-            border: 1px solid #eee;
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .contact-info h3 {
-            font-size: 14px;
-            color: #333;
-            margin-bottom: 5px;
+        .contact-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 8px;
         }
 
         .contact-detail {
             font-size: 12px;
-            color: #999;
-            margin-bottom: 3px;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
         }
 
-        .contact-role {
-            font-size: 13px;
-            font-weight: 600;
-            color: #667eea;
-            margin-top: 5px;
+        .suggestion-box {
+            background: #E8F7F5;
+            padding: 15px;
+            margin: 20px 0;
+            transition: all 0.3s;
         }
 
-        .contact-actions {
-            display: flex;
-            gap: 8px;
+        body.action-mode .suggestion-box {
+            background: #FFF8E8;
         }
 
-        .btn-small {
-            padding: 6px 12px;
-            font-size: 12px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.3s;
+        .suggestion-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: var(--accent);
+            font-weight: 700;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
         }
 
-        .btn-small:hover {
-            background: #5568d3;
-        }
-
-        .btn-skip {
-            background: #ddd;
-            color: #666;
-        }
-
-        .btn-skip:hover {
-            background: #ccc;
+        .suggestion-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
         }
 
         .confidence {
             font-size: 11px;
-            color: #999;
-            margin-top: 3px;
+            color: var(--accent);
+            font-weight: 700;
+            margin-top: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .reasoning {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 12px;
+            line-height: 1.6;
+            font-style: italic;
+        }
+
+        .status-message {
+            padding: 10px 12px;
+            font-size: 11px;
+            font-weight: 700;
+            margin-top: 15px;
+            background: #f5f5f5;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-small {
+            padding: 10px 14px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 700;
+            flex: 1;
+            text-align: center;
+            background: white;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            border: none;
+        }
+
+        .btn-small-approve {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-small-approve:hover {
+            background: var(--primary-light);
+            box-shadow: 0 2px 6px rgba(13, 92, 61, 0.2);
+        }
+
+        .btn-small-skip {
+            background: #f5f5f5;
+            color: var(--text-secondary);
+        }
+
+        .btn-small-skip:hover {
+            background: #efefef;
         }
 
         .empty-state {
             text-align: center;
-            padding: 40px;
-            color: #999;
+            padding: 50px 30px;
+            color: var(--text-secondary);
         }
 
         .empty-state p {
-            margin-bottom: 10px;
-        }
-
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 25px;
-            border-bottom: 2px solid #f0f0f0;
-        }
-
-        .tab-btn {
-            padding: 12px 20px;
-            background: none;
-            border: none;
-            border-bottom: 3px solid transparent;
             font-size: 14px;
-            font-weight: 600;
-            color: #999;
-            cursor: pointer;
-            transition: all 0.3s;
         }
 
-        .tab-btn.active {
-            color: #667eea;
-            border-bottom-color: #667eea;
-        }
-
-        .tab-btn:hover {
-            color: #667eea;
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        .sources-grid {
+        /* Empty State Dashboard */
+        .empty-state-dashboard {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 12px;
-            margin-bottom: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            padding: 50px 40px;
+            justify-content: center;
+            align-content: center;
         }
 
-        .source-card {
-            padding: 15px;
-            border: 2px solid #eee;
-            border-radius: 8px;
+        .dashboard-card {
+            background: white;
+            padding: 35px 25px;
             text-align: center;
-            cursor: pointer;
             transition: all 0.3s;
-            background: #f9f9f9;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
 
-        .source-card:hover {
-            border-color: #667eea;
-            background: #f0f4ff;
+        .dashboard-card:hover {
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+            transform: translateY(-2px);
         }
 
-        .source-card.selected {
-            border-color: #667eea;
-            background: #f0f4ff;
-            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        .dashboard-card-number {
+            font-size: 42px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 12px;
         }
 
-        .source-icon {
-            font-size: 24px;
-            margin-bottom: 8px;
+        .dashboard-card-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            font-weight: 700;
+            letter-spacing: 0.5px;
         }
 
-        .source-name {
-            font-size: 13px;
+        .dashboard-card-icon {
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+
+        /* Footer */
+        .footer {
+            background: white;
+            border-top: 1px solid #e8e8e8;
+            padding: 30px 40px;
+            text-align: center;
+            margin-top: auto;
+            flex-shrink: 0;
+        }
+
+        .footer-content {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             font-weight: 600;
-            color: #333;
+            color: var(--primary);
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .source-status {
-            font-size: 11px;
-            color: #999;
-            margin-top: 5px;
+        .footer-logo svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .footer-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 16px 20px;
+            }
+
+            .main-container {
+                padding: 20px;
+            }
+
+            .sidebar {
+                position: static;
+            }
+
+            .contacts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .content-header {
+                padding: 25px 20px;
+            }
+
+            .content-header h2 {
+                font-size: 22px;
+            }
+
+            .content-body {
+                padding: 25px 20px;
+            }
+
+            .footer {
+                padding: 20px;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 10px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🎯 VIBS CRM Assistant</h1>
-        <p class="subtitle">Intelligent contact enrichment from internal & online sources</p>
-
-        <!-- Enrichment Tabs -->
-        <div class="tabs">
-            <button class="tab-btn active" data-tab="internal">📊 Internal Data</button>
-            <button class="tab-btn" data-tab="online">🌐 Online Sources</button>
-        </div>
-
-        <!-- Internal Data Enrichment Tab -->
-        <div id="internal" class="tab-content active">
-            <!-- Stats -->
-            <div class="stats">
-                <div class="stat-box">
-                    <div class="stat-number" id="count-auto">0</div>
-                    <div class="stat-label">Auto-Approved</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-number" id="count-review">0</div>
-                    <div class="stat-label">For Review</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-number" id="count-total">0</div>
-                    <div class="stat-label">Total Processed</div>
-                </div>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Outer triangle -->
+                    <polygon points="50,10 90,80 10,80" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
+                    <!-- Inner structure - network lines -->
+                    <line x1="50" y1="10" x2="30" y2="50" stroke="currentColor" stroke-width="1.5"/>
+                    <line x1="50" y1="10" x2="70" y2="50" stroke="currentColor" stroke-width="1.5"/>
+                    <line x1="30" y1="50" x2="70" y2="50" stroke="currentColor" stroke-width="1.5"/>
+                    <line x1="30" y1="50" x2="50" y2="75" stroke="currentColor" stroke-width="1.5"/>
+                    <line x1="70" y1="50" x2="50" y2="75" stroke="currentColor" stroke-width="1.5"/>
+                    <!-- Center brain/network node -->
+                    <circle cx="50" cy="45" r="8" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                    <circle cx="50" cy="45" r="4" fill="currentColor"/>
+                    <!-- Connection points -->
+                    <circle cx="30" cy="50" r="2.5" fill="currentColor"/>
+                    <circle cx="70" cy="50" r="2.5" fill="currentColor"/>
+                    <circle cx="50" cy="75" r="2.5" fill="currentColor"/>
+                </svg>
+                VIBS
             </div>
-
-            <!-- Property Selector -->
-            <div style="margin-bottom: 20px;">
-                <label for="property-selector" style="display: block; font-weight: 600; margin-bottom: 8px; color: #333;">Select Property to Enrich:</label>
-                <select id="property-selector" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
-                    <option value="">Loading properties...</option>
-                </select>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="button-group">
-                <button class="btn-primary" id="btn-enrich">Start Enrichment (5 Contacts)</button>
-                <button class="btn-secondary" id="btn-reset">Reset</button>
-            </div>
-        </div>
-
-        <!-- Online Sources Enrichment Tab -->
-        <div id="online" class="tab-content">
-            <p style="margin-bottom: 20px; color: #666; font-size: 14px;">Enrich contacts using data from online sources. Select the sources you want to use:</p>
-
-            <!-- Source Selection -->
-            <div class="sources-grid">
-                <div class="source-card" data-source="linkedin" onclick="toggleSource(this)">
-                    <div class="source-icon">💼</div>
-                    <div class="source-name">LinkedIn</div>
-                    <div class="source-status">Coming Soon</div>
-                </div>
-                <div class="source-card" data-source="company-website" onclick="toggleSource(this)">
-                    <div class="source-icon">🌍</div>
-                    <div class="source-name">Company Website</div>
-                    <div class="source-status">Coming Soon</div>
-                </div>
-                <div class="source-card" data-source="clearbit" onclick="toggleSource(this)">
-                    <div class="source-icon">🔍</div>
-                    <div class="source-name">Clearbit</div>
-                    <div class="source-status">Coming Soon</div>
-                </div>
-                <div class="source-card" data-source="hunter" onclick="toggleSource(this)">
-                    <div class="source-icon">🎯</div>
-                    <div class="source-name">Hunter.io</div>
-                    <div class="source-status">Coming Soon</div>
-                </div>
-                <div class="source-card" data-source="apollo" onclick="toggleSource(this)">
-                    <div class="source-icon">🚀</div>
-                    <div class="source-name">Apollo.io</div>
-                    <div class="source-status">Coming Soon</div>
-                </div>
-                <div class="source-card" data-source="enrichment-api" onclick="toggleSource(this)">
-                    <div class="source-icon">⚡</div>
-                    <div class="source-name">ZoomInfo</div>
-                    <div class="source-status">Coming Soon</div>
-                </div>
-            </div>
-
-            <!-- Property Selector for Online Enrichment -->
-            <div style="margin-bottom: 20px;">
-                <label for="online-property-selector" style="display: block; font-weight: 600; margin-bottom: 8px; color: #333;">Select Properties to Populate:</label>
-                <select id="online-property-selector" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;" multiple>
-                    <option value="">Loading properties...</option>
-                </select>
-                <p style="font-size: 12px; color: #999; margin-top: 5px;">Hold Ctrl/Cmd to select multiple properties</p>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="button-group">
-                <button class="btn-primary" id="btn-online-enrich" disabled>Start Online Enrichment (5 Contacts)</button>
-                <button class="btn-secondary" id="btn-online-reset">Reset</button>
-            </div>
-
-            <!-- Selected Sources Display -->
-            <div id="selected-sources" style="margin-top: 20px; padding: 15px; background: #f9f9f9; border-radius: 8px; display: none;">
-                <p style="font-weight: 600; color: #333; margin-bottom: 10px;">Selected Sources:</p>
-                <div id="sources-list" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
-            </div>
-        </div>
-
-        <!-- Loading State -->
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <div class="loading-text">Analyzing contacts with Claude AI...</div>
-        </div>
-
-        <!-- Results -->
-        <div class="results" id="results">
-            <!-- Auto-Approved Section -->
-            <div class="section" id="section-auto">
-                <div class="section-title">
-                    ✅ Auto-Approved (>95% Confidence)
-                    <span class="badge badge-auto" id="badge-auto">0</span>
-                </div>
-                <div id="auto-list">
-                    <div class="empty-state">No auto-approved contacts</div>
-                </div>
-            </div>
-
-            <!-- Review Queue Section -->
-            <div class="section" id="section-review">
-                <div class="section-title">
-                    ⚠️ Review Queue (<95% Confidence)
-                    <span class="badge badge-review" id="badge-review">0</span>
-                </div>
-                <div id="review-list">
-                    <div class="empty-state">No contacts to review</div>
-                </div>
+            <div class="header-right">
+                <div class="mode-badge" id="mode-display">🧪 Testing</div>
+                <div class="changes-counter">📊 <span id="changes-count">0</span></div>
+                <div class="credits-display">💳 <span id="credits-balance">500</span></div>
+                <button id="logout-btn" style="padding: 8px 16px; background: #ff4444; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 14px;">Logout</button>
             </div>
         </div>
     </div>
 
+    <!-- Main -->
+    <div class="main-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-section">
+                <div class="sidebar-title">Mode</div>
+                <div class="mode-selector">
+                    <div class="mode-option">
+                        <input type="radio" id="mode-test" name="enrichment-mode" value="test" checked>
+                        <label for="mode-test">🧪 Testing</label>
+                    </div>
+                    <div class="mode-option">
+                        <input type="radio" id="mode-action" name="enrichment-mode" value="action">
+                        <label for="mode-action">⚡ Action</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">Property</div>
+                <div class="property-selector">
+                    <select id="property-selector" class="search-input">
+                        <option value="">Select a property...</option>
+                    </select>
+                    <small class="property-help">💡 Choose a property to enrich with AI</small>
+                </div>
+
+                <!-- Enrichment Progress Indicator -->
+                <div id="enrichment-progress-container" style="display: none; margin-top: 16px;">
+                    <div class="progress-label">Database Enrichment</div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar">
+                            <div id="enrichment-progress-fill" class="progress-fill" style="width: 0%;"></div>
+                        </div>
+                        <div id="enrichment-progress-text" class="progress-text">0%</div>
+                    </div>
+                    <div id="enrichment-stats" class="progress-stats">0 of 0 contacts</div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">Enrichment Sources</div>
+                <div class="sources-list">
+                    <div class="source-item">
+                        <input type="checkbox" id="source-internal" name="enrichment-source" value="internal" checked>
+                        <label for="source-internal">
+                            <span class="source-name">Internal Data</span>
+                            <span class="source-desc">Claude AI analysis</span>
+                        </label>
+                    </div>
+                    <div class="source-item">
+                        <input type="checkbox" id="source-linkedin" name="enrichment-source" value="linkedin">
+                        <label for="source-linkedin">
+                            <span class="source-name">LinkedIn</span>
+                            <span class="source-desc">Professional profiles</span>
+                        </label>
+                    </div>
+                    <div class="source-item">
+                        <input type="checkbox" id="source-social" name="enrichment-source" value="social">
+                        <label for="source-social">
+                            <span class="source-name">Social Media</span>
+                            <span class="source-desc">Twitter, Facebook, Instagram</span>
+                        </label>
+                    </div>
+                    <div class="source-item">
+                        <input type="checkbox" id="source-websites" name="enrichment-source" value="websites">
+                        <label for="source-websites">
+                            <span class="source-name">Websites</span>
+                            <span class="source-desc">Company & personal sites</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="sidebar-title">Batch Size</div>
+                <div class="batch-control">
+                    <input type="range" id="batch-slider" min="1" max="100" value="5" class="slider">
+                    <div class="batch-info">
+                        <span id="batch-value">5</span> / <span id="batch-max">100</span> contacts
+                    </div>
+                    <div class="credit-cost">
+                        Cost: <span id="credit-cost">5</span> credits
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="action-buttons">
+                    <button class="btn-primary" id="btn-enrich">Start Enrichment</button>
+                    <button class="btn-secondary" id="btn-reset">Reset</button>
+                    <button class="btn-danger" id="btn-revert" style="display: none;">Revert</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="content">
+            <div class="content-header">
+                <h2>Contact Enrichment</h2>
+                <p>AI-powered intelligence for your HubSpot contacts</p>
+            </div>
+
+            <div class="content-body">
+                <!-- Empty State Dashboard -->
+                <div class="empty-state-dashboard" id="empty-dashboard">
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-icon">✅</div>
+                        <div class="dashboard-card-number" id="dash-auto">0</div>
+                        <div class="dashboard-card-label">Auto-Enriched</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-icon">⚠️</div>
+                        <div class="dashboard-card-number" id="dash-review">0</div>
+                        <div class="dashboard-card-label">Ready for Review</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-icon">⏳</div>
+                        <div class="dashboard-card-number" id="dash-pending">0</div>
+                        <div class="dashboard-card-label">Pending</div>
+                    </div>
+                    <div class="dashboard-card">
+                        <div class="dashboard-card-icon">📊</div>
+                        <div class="dashboard-card-number" id="dash-total">0</div>
+                        <div class="dashboard-card-label">Total Enriched</div>
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="stats-grid" id="stats-section" style="display: none;">
+                    <div class="stat-card">
+                        <div class="stat-number" id="count-auto">0</div>
+                        <div class="stat-label">Auto-Approved</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="count-review">0</div>
+                        <div class="stat-label">For Review</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="count-total">0</div>
+                        <div class="stat-label">Total</div>
+                    </div>
+                </div>
+
+                <!-- Loading -->
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <div class="loading-text">Analyzing Contacts</div>
+                    <div class="loading-subtext">Running Claude AI analysis...</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <div class="stages-list" id="stages-list">
+                        <div class="stage-item active" data-stage="fetching">
+                            <div class="stage-icon">📥</div>
+                            <div class="stage-text">Fetching contacts</div>
+                        </div>
+                        <div class="stage-item pending" data-stage="analyzing">
+                            <div class="stage-icon">🤖</div>
+                            <div class="stage-text">Analyzing with AI</div>
+                        </div>
+                        <div class="stage-item pending" data-stage="processing">
+                            <div class="stage-icon">⚙️</div>
+                            <div class="stage-text">Processing results</div>
+                        </div>
+                        <div class="stage-item pending" data-stage="complete">
+                            <div class="stage-icon">✅</div>
+                            <div class="stage-text">Complete</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results -->
+                <div class="results" id="results">
+                    <div class="section" id="section-auto">
+                        <div class="section-header">
+                            ✅ Auto-Approved
+                            <span class="section-badge" id="badge-auto">0</span>
+                        </div>
+                        <div class="contacts-grid" id="auto-list">
+                            <div class="empty-state">No auto-approved contacts</div>
+                        </div>
+                    </div>
+
+                    <div class="section" id="section-review">
+                        <div class="section-header">
+                            ⚠️ Review Queue
+                            <span class="section-badge" id="badge-review">0</span>
+                        </div>
+                        <div class="contacts-grid" id="review-list">
+                            <div class="empty-state">No contacts to review</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <polygon points="50,10 90,80 10,80" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round"/>
+                    <line x1="50" y1="10" x2="30" y2="50" stroke="currentColor" stroke-width="1.5"/>
+                    <line x1="50" y1="10" x2="70" y2="50" stroke="currentColor" stroke-width="1.5"/>
+                    <line x1="30" y1="50" x2="70" y2="50" stroke="currentColor" stroke-width="1.5"/>
+                    <line x1="30" y1="50" x2="50" y2="75" stroke="currentColor" stroke-width="1.5"/>
+                    <line x1="70" y1="50" x2="50" y2="75" stroke="currentColor" stroke-width="1.5"/>
+                    <circle cx="50" cy="45" r="8" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                    <circle cx="50" cy="45" r="4" fill="currentColor"/>
+                    <circle cx="30" cy="50" r="2.5" fill="currentColor"/>
+                    <circle cx="70" cy="50" r="2.5" fill="currentColor"/>
+                    <circle cx="50" cy="75" r="2.5" fill="currentColor"/>
+                </svg>
+                VIBS CRM Assistant
+            </div>
+            <div class="footer-text">© 2026 Powered by Claude AI</div>
+        </div>
+    </div>
+
     <script>
+        // Authentication check - redirect to login if not authenticated
+        if (localStorage.getItem('vibs_auth') !== 'true') {
+            window.location.href = '/login';
+        }
+
         const API_BASE = "/api";
-        let selectedSources = new Set();
+
+        // Logout functionality
+        document.getElementById("logout-btn").addEventListener("click", function() {
+            if (confirm('Are you sure you want to logout?')) {
+                localStorage.removeItem('vibs_auth');
+                localStorage.removeItem('vibs_user');
+                localStorage.removeItem('vibs_name');
+                localStorage.removeItem('vibs_company');
+                window.location.href = '/login';
+            }
+        });
 
         document.getElementById("btn-enrich").addEventListener("click", startEnrichment);
         document.getElementById("btn-reset").addEventListener("click", resetUI);
-        document.getElementById("btn-online-enrich").addEventListener("click", startOnlineEnrichment);
-        document.getElementById("btn-online-reset").addEventListener("click", resetOnlineUI);
+        document.getElementById("btn-revert").addEventListener("click", revertChanges);
 
-        // Tab switching
-        document.querySelectorAll(".tab-btn").forEach(btn => {
-            btn.addEventListener("click", () => {
-                const tabName = btn.getAttribute("data-tab");
-                switchTab(tabName);
-            });
+        document.querySelectorAll('input[name="enrichment-mode"]').forEach(radio => {
+            radio.addEventListener("change", updateModeDisplay);
         });
 
-        function switchTab(tabName) {
-            // Hide all tabs
-            document.querySelectorAll(".tab-content").forEach(tab => {
-                tab.classList.remove("active");
-            });
-            document.querySelectorAll(".tab-btn").forEach(btn => {
-                btn.classList.remove("active");
-            });
-
-            // Show selected tab
-            document.getElementById(tabName).classList.add("active");
-            document.querySelector(`[data-tab="${tabName}"]`).classList.add("active");
-        }
-
-        function toggleSource(element) {
-            const source = element.getAttribute("data-source");
-            element.classList.toggle("selected");
-
-            if (element.classList.contains("selected")) {
-                selectedSources.add(source);
-            } else {
-                selectedSources.delete(source);
-            }
-
-            updateSelectedSourcesDisplay();
-            updateOnlineEnrichButton();
-        }
-
-        function updateSelectedSourcesDisplay() {
-            const sourcesList = document.getElementById("sources-list");
-            const selectedSourcesDiv = document.getElementById("selected-sources");
-
-            if (selectedSources.size > 0) {
-                selectedSourcesDiv.style.display = "block";
-                sourcesList.innerHTML = Array.from(selectedSources).map(source => {
-                    const card = document.querySelector(`[data-source="${source}"]`);
-                    const name = card.querySelector(".source-name").textContent;
-                    return `<span style="background: #667eea; color: white; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">${name}</span>`;
-                }).join("");
-            } else {
-                selectedSourcesDiv.style.display = "none";
-            }
-        }
-
-        function updateOnlineEnrichButton() {
-            const btn = document.getElementById("btn-online-enrich");
-            btn.disabled = selectedSources.size === 0;
-        }
-
-        async function startOnlineEnrichment() {
-            alert("Online enrichment coming soon! Selected sources: " + Array.from(selectedSources).join(", "));
-        }
-
-        function resetOnlineUI() {
-            selectedSources.clear();
-            document.querySelectorAll(".source-card").forEach(card => {
-                card.classList.remove("selected");
-            });
-            updateSelectedSourcesDisplay();
-            updateOnlineEnrichButton();
-        }
-
-        // Load properties on page load
         document.addEventListener("DOMContentLoaded", loadProperties);
+
+        // Handle batch slider changes
+        const batchSlider = document.getElementById("batch-slider");
+        batchSlider.addEventListener("input", function() {
+            const value = parseInt(this.value);
+            document.getElementById("batch-value").textContent = value;
+            document.getElementById("credit-cost").textContent = value;
+        });
+
+        // Store current mode to detect transitions
+        let currentMode = 'test';
+
+        // Credit system - track user credits (starting with 500)
+        let userCredits = 500;
+
+        // Play bell sound for Testing → Action transition
+        function playActionBell() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const now = audioContext.currentTime;
+
+                // Bell-like sound with multiple harmonics
+                const frequencies = [523.25, 784.99, 1046.50]; // C5, G5, C6
+                const durations = [0.4, 0.3, 0.2];
+
+                frequencies.forEach((freq, idx) => {
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+
+                    osc.connect(gain);
+                    gain.connect(audioContext.destination);
+
+                    osc.frequency.value = freq;
+                    osc.type = 'sine';
+
+                    gain.gain.setValueAtTime(0.08, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + durations[idx]);
+
+                    osc.start(now);
+                    osc.stop(now + durations[idx]);
+                });
+            } catch (e) {
+                console.log('Audio context not available');
+            }
+        }
+
+        // Play counterpart sound for Action → Testing transition (lower, softer)
+        function playTestingChime() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const now = audioContext.currentTime;
+
+                // Lower, softer chime for testing mode
+                const frequencies = [349.23, 523.25, 698.46]; // F4, C5, F5
+                const durations = [0.35, 0.25, 0.15];
+
+                frequencies.forEach((freq, idx) => {
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+
+                    osc.connect(gain);
+                    gain.connect(audioContext.destination);
+
+                    osc.frequency.value = freq;
+                    osc.type = 'sine';
+
+                    gain.gain.setValueAtTime(0.08, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + durations[idx]);
+
+                    osc.start(now);
+                    osc.stop(now + durations[idx]);
+                });
+            } catch (e) {
+                console.log('Audio context not available');
+            }
+        }
+
+        function updateModeDisplay() {
+            const mode = document.querySelector('input[name="enrichment-mode"]:checked').value;
+            const display = document.getElementById("mode-display");
+            display.textContent = mode === 'test' ? "🧪 Testing" : "⚡ Action";
+
+            // Play sound when mode changes
+            if (currentMode !== mode) {
+                if (mode === 'action') {
+                    playActionBell(); // Testing → Action: bright bell
+                } else {
+                    playTestingChime(); // Action → Testing: softer chime
+                }
+                currentMode = mode;
+            }
+
+            const root = document.documentElement;
+
+            // Update body class for color scheme
+            if (mode === 'action') {
+                document.body.classList.add('action-mode');
+                // Set CSS variables directly for action mode
+                root.style.setProperty('--primary', '#FF6B35');
+                root.style.setProperty('--primary-light', '#FF8C42');
+                root.style.setProperty('--accent', '#FFD60A');
+                root.style.setProperty('--bg-light', '#FFF8E8');
+            } else {
+                document.body.classList.remove('action-mode');
+                // Reset CSS variables for test mode (blue palette)
+                root.style.setProperty('--primary', '#1E5A96');
+                root.style.setProperty('--primary-light', '#3B82F6');
+                root.style.setProperty('--accent', '#60A5FA');
+                root.style.setProperty('--bg-light', '#EBF2FF');
+            }
+        }
+
+        // Store properties for reference
+        let allProperties = [];
+
+        function selectProperty(value) {
+            document.getElementById("property-selector").value = value;
+        }
 
         async function loadProperties() {
             try {
                 const response = await fetch(`${API_BASE}/properties`);
                 const data = await response.json();
+                allProperties = data.properties;
 
+                // Populate select dropdown with optgroups by section
                 const selector = document.getElementById("property-selector");
-                const onlineSelector = document.getElementById("online-property-selector");
 
-                const options = data.properties.map(prop =>
-                    `<option value="${prop.name}">${prop.label}</option>`
-                ).join("");
+                // Group properties by section
+                const sections = {};
+                allProperties.forEach(prop => {
+                    const section = prop.section || "Other";
+                    if (!sections[section]) {
+                        sections[section] = [];
+                    }
+                    sections[section].push(prop);
+                });
 
-                selector.innerHTML = options;
-                onlineSelector.innerHTML = options;
+                // Define section order (Targeting/segmentation first, then Legacy/data storage, then others)
+                const sectionOrder = [
+                    "Targeting / segmentation",
+                    "Legacy / data storage",
+                    "General",
+                    "Other"
+                ];
+
+                // Add optgroups for each section in desired order
+                sectionOrder.forEach(section => {
+                    if (!sections[section]) return;
+
+                    const optgroup = document.createElement("optgroup");
+                    optgroup.label = section;
+
+                    // Sort properties within section by label
+                    sections[section].sort((a, b) => a.label.localeCompare(b.label));
+
+                    sections[section].forEach(prop => {
+                        const option = document.createElement("option");
+                        option.value = prop.name;  // Internal name for backend
+                        option.textContent = prop.label;  // Public name shown to user
+                        option.title = `Internal: ${prop.name}`;
+                        optgroup.appendChild(option);
+                    });
+                    selector.appendChild(optgroup);
+                });
+
+                // Add any remaining sections not in the order list
+                Object.keys(sections).forEach(section => {
+                    if (sectionOrder.includes(section)) return;
+                    const optgroup = document.createElement("optgroup");
+                    optgroup.label = section;
+                    sections[section].sort((a, b) => a.label.localeCompare(b.label));
+                    sections[section].forEach(prop => {
+                        const option = document.createElement("option");
+                        option.value = prop.name;
+                        option.textContent = prop.label;
+                        option.title = `Internal: ${prop.name}`;
+                        optgroup.appendChild(option);
+                    });
+                    selector.appendChild(optgroup);
+                });
             } catch (error) {
                 console.error("Error loading properties:", error);
-                alert("Error loading properties: " + error.message);
             }
         }
 
         async function startEnrichment() {
-            const btn = document.getElementById("btn-enrich");
-            const propertySelector = document.getElementById("property-selector");
-            const selectedProperty = propertySelector.value;
+            const propertyHidden = document.getElementById("property-selector");
+            const selectedProperty = propertyHidden.value.trim();
+            const selectedMode = document.querySelector('input[name="enrichment-mode"]:checked').value;
+            const batchSize = parseInt(document.getElementById("batch-slider").value);
+
+            // Get selected enrichment sources
+            const selectedSources = Array.from(document.querySelectorAll('input[name="enrichment-source"]:checked'))
+                .map(el => el.value);
 
             if (!selectedProperty) {
-                alert("Please select a property to enrich");
+                alert("Please search and select a property to enrich");
                 return;
             }
 
-            btn.disabled = true;
+            // Validate that the selected property exists
+            const validProperty = allProperties.find(p => p.name === selectedProperty);
+            if (!validProperty) {
+                alert(`Property "${selectedProperty}" not found. Please select from the dropdown.`);
+                return;
+            }
+
+            // Check credits in action mode
+            if (selectedMode === "action" && userCredits < batchSize) {
+                alert(`Insufficient credits. You need ${batchSize} credits but have ${userCredits}`);
+                return;
+            }
+
             document.getElementById("loading").style.display = "block";
             document.getElementById("results").style.display = "none";
+            document.getElementById("stats-section").style.display = "none";
+
+            document.querySelectorAll(".stage-item").forEach(el => {
+                el.classList.remove('completed', 'active');
+                el.classList.add('pending');
+            });
+
+            updateProgress(0);
+            updateStage("fetching", "active");
 
             try {
+                updateProgress(20);
+                await new Promise(r => setTimeout(r, 500));
+                updateStage("fetching", "completed");
+
+                updateStage("analyzing", "active");
+                updateProgress(40);
+
+                // Use the internal property name if available
+                const propertyName = validProperty.name;
+
                 const response = await fetch(`${API_BASE}/enrich`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         action: "fetch",
-                        property_name: selectedProperty
+                        property_name: propertyName,
+                        mode: selectedMode,
+                        batch_size: batchSize,
+                        enrichment_sources: selectedSources
                     })
                 });
 
+                updateProgress(70);
                 const data = await response.json();
+                updateStage("analyzing", "completed");
+
+                updateStage("processing", "active");
+                updateProgress(85);
+                await new Promise(r => setTimeout(r, 300));
+
                 displayResults(data);
+
+                updateProgress(100);
+                updateStage("processing", "completed");
+                updateStage("complete", "active");
+                await new Promise(r => setTimeout(r, 500));
+                updateStage("complete", "completed");
+
+                updateChangesCount();
             } catch (error) {
                 console.error("Error:", error);
                 alert("Error enriching contacts: " + error.message);
             } finally {
-                document.getElementById("loading").style.display = "none";
-                btn.disabled = false;
+                setTimeout(() => {
+                    document.getElementById("loading").style.display = "none";
+                }, 1000);
             }
+        }
+
+        function updateStage(stageName, status) {
+            const stage = document.querySelector(`[data-stage="${stageName}"]`);
+            if (!stage) return;
+            stage.classList.remove('pending', 'active', 'completed');
+            stage.classList.add(status);
+        }
+
+        function updateProgress(percentage) {
+            document.getElementById("progress-fill").style.width = percentage + "%";
         }
 
         function displayResults(data) {
@@ -615,82 +1622,228 @@
             const reviewQueue = data.review_queue || [];
             const total = autoApproved.length + reviewQueue.length;
 
-            // Update stats
             document.getElementById("count-auto").textContent = autoApproved.length;
             document.getElementById("count-review").textContent = reviewQueue.length;
             document.getElementById("count-total").textContent = total;
             document.getElementById("badge-auto").textContent = autoApproved.length;
             document.getElementById("badge-review").textContent = reviewQueue.length;
 
-            // Display auto-approved
+            // Update dashboard
+            document.getElementById("dash-auto").textContent = autoApproved.length;
+            document.getElementById("dash-review").textContent = reviewQueue.length;
+            document.getElementById("dash-total").textContent = total;
+
             const autoList = document.getElementById("auto-list");
             if (autoApproved.length > 0) {
-                autoList.innerHTML = autoApproved.map(contact => `
-                    <div class="contact-item">
-                        <div class="contact-info">
-                            <h3>${contact.name}</h3>
-                            <div class="contact-detail">Job Title: ${contact.job_title}</div>
-                            <div class="contact-role">→ ${contact.suggested_value}</div>
-                            <div class="confidence">Confidence: ${contact.confidence}%</div>
-                            <div class="contact-detail"><em>${contact.reasoning}</em></div>
-                        </div>
-                    </div>
-                `).join("");
+                autoList.innerHTML = autoApproved.map(contact => createContactCard(contact, 'auto')).join("");
             }
 
-            // Display review queue
             const reviewList = document.getElementById("review-list");
             if (reviewQueue.length > 0) {
-                reviewList.innerHTML = reviewQueue.map(contact => `
-                    <div class="contact-item">
-                        <div class="contact-info">
-                            <h3>${contact.name}</h3>
-                            <div class="contact-detail">Job Title: ${contact.job_title}</div>
-                            <div class="contact-role">→ ${contact.suggested_value}</div>
-                            <div class="confidence">Confidence: ${contact.confidence}% ⚠️</div>
-                            <div class="contact-detail"><em>${contact.reasoning}</em></div>
-                        </div>
-                        <div class="contact-actions">
-                            <button class="btn-small" onclick="approveContact('${contact.id}', '${contact.suggested_value}', ${contact.confidence}, '${contact.property_name}')">Approve</button>
-                            <button class="btn-small btn-skip" onclick="skipContact('${contact.id}')">Skip</button>
-                        </div>
-                    </div>
-                `).join("");
+                reviewList.innerHTML = reviewQueue.map(contact => createContactCard(contact, 'review')).join("");
             }
 
+            // Update credits if deducted in action mode
+            if (data.credits_remaining !== undefined) {
+                userCredits = data.credits_remaining;
+                document.getElementById("credits-balance").textContent = userCredits;
+            }
+
+            // Hide dashboard, show results
+            document.getElementById("empty-dashboard").style.display = "none";
+            document.getElementById("stats-section").style.display = "grid";
             document.getElementById("results").style.display = "block";
         }
 
+        function createContactCard(contact, type) {
+            return `
+                <div class="contact-card">
+                    <div class="contact-name">${contact.name}</div>
+                    <div class="contact-detail">📋 ${contact.job_title}</div>
+
+                    <div class="suggestion-box">
+                        <div class="suggestion-label">Suggestion</div>
+                        <div class="suggestion-value">${contact.suggested_value}</div>
+                        <div class="confidence">Confidence: ${contact.confidence}%</div>
+                    </div>
+
+                    <div class="reasoning">"${contact.reasoning}"</div>
+                    <div class="status-message">${contact.message}</div>
+
+                    ${type === 'review' ? `
+                        <div class="card-actions">
+                            <button class="btn-small btn-small-approve" onclick="approveContact('${contact.id}', '${contact.suggested_value}', ${contact.confidence}, '${contact.property_name}')">
+                                Approve
+                            </button>
+                            <button class="btn-small btn-small-skip" onclick="skipContact('${contact.id}')">
+                                Skip
+                            </button>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
         async function approveContact(contactId, value, confidence, propertyName) {
+            const mode = document.querySelector('input[name="enrichment-mode"]:checked').value;
+
+            // Find and disable the approve button
+            const approveBtn = event.target;
+            approveBtn.disabled = true;
+            approveBtn.style.opacity = "0.6";
+
+            if (mode === "test") {
+                approveBtn.innerHTML = "✓ Would Save";
+                approveBtn.style.background = "#10b981";
+                setTimeout(() => {
+                    approveBtn.disabled = false;
+                    approveBtn.style.opacity = "1";
+                    approveBtn.innerHTML = "Approve";
+                    approveBtn.style.background = "";
+                }, 2000);
+                return;
+            }
+
             try {
-                await fetch(`${API_BASE}/enrich`, {
+                // Make API call to approve in action mode
+                const response = await fetch(`${API_BASE}/enrich`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
                         action: "approve",
                         contact_id: contactId,
                         value: value,
-                        confidence: confidence,
                         property_name: propertyName
                     })
                 });
-                alert("Contact approved and saved to HubSpot!");
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Update button to show checkmark
+                    approveBtn.innerHTML = "✓ Approved";
+                    approveBtn.style.background = "#10b981";
+
+                    // Remove the contact card after a brief delay
+                    setTimeout(() => {
+                        const card = approveBtn.closest(".contact-card");
+                        if (card) {
+                            card.style.opacity = "0.5";
+                            card.style.pointerEvents = "none";
+                        }
+                    }, 500);
+
+                    // Update progress bar
+                    const selectedProperty = document.getElementById("property-selector").value;
+                    if (selectedProperty) {
+                        await loadEnrichmentStats(selectedProperty);
+                    }
+
+                    // Update changes count
+                    updateChangesCount();
+                } else {
+                    approveBtn.disabled = false;
+                    approveBtn.style.opacity = "1";
+                    alert("Error approving contact: " + (result.error || "Unknown error"));
+                }
             } catch (error) {
-                alert("Error approving contact: " + error.message);
+                approveBtn.disabled = false;
+                approveBtn.style.opacity = "1";
+                alert("Error: " + error.message);
             }
         }
 
         function skipContact(contactId) {
-            alert("Contact skipped");
+            // Find and disable the skip button
+            const skipBtn = event.target;
+            skipBtn.disabled = true;
+            skipBtn.style.opacity = "0.6";
+
+            skipBtn.innerHTML = "⊘ Skipped";
+            skipBtn.style.background = "#ef4444";
+
+            // Remove the contact card
+            setTimeout(() => {
+                const card = skipBtn.closest(".contact-card");
+                if (card) {
+                    card.style.opacity = "0.5";
+                    card.style.pointerEvents = "none";
+                }
+            }, 500);
+        }
+
+        async function updateChangesCount() {
+            try {
+                const response = await fetch(`${API_BASE}/changes`);
+                const data = await response.json();
+                document.getElementById("changes-count").textContent = data.count;
+                document.getElementById("btn-revert").style.display = data.count > 0 ? "block" : "none";
+            } catch (error) {
+                console.error("Error fetching changes count:", error);
+            }
+        }
+
+        async function revertChanges() {
+            if (!confirm("Revert all changes?")) return;
+            try {
+                const response = await fetch(`${API_BASE}/revert`, { method: "POST" });
+                const data = await response.json();
+                alert(data.message);
+                updateChangesCount();
+            } catch (error) {
+                alert("Error reverting changes: " + error.message);
+            }
         }
 
         function resetUI() {
             document.getElementById("results").style.display = "none";
             document.getElementById("loading").style.display = "none";
-            document.getElementById("count-auto").textContent = "0";
-            document.getElementById("count-review").textContent = "0";
-            document.getElementById("count-total").textContent = "0";
+            document.getElementById("stats-section").style.display = "none";
+            document.getElementById("empty-dashboard").style.display = "grid";
+            document.getElementById("property-selector").value = "";
+            document.getElementById("enrichment-progress-container").style.display = "none";
+            // Reset sources to default (internal only)
+            document.getElementById("source-internal").checked = true;
+            document.getElementById("source-linkedin").checked = false;
+            document.getElementById("source-social").checked = false;
+            document.getElementById("source-websites").checked = false;
         }
+
+        async function loadEnrichmentStats(propertyName) {
+            if (!propertyName) {
+                document.getElementById("enrichment-progress-container").style.display = "none";
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}/enrichment-stats/${propertyName}`);
+                const data = await response.json();
+
+                // Show progress container
+                const container = document.getElementById("enrichment-progress-container");
+                container.style.display = "block";
+
+                // Update progress bar
+                const fillElement = document.getElementById("enrichment-progress-fill");
+                const textElement = document.getElementById("enrichment-progress-text");
+                const statsElement = document.getElementById("enrichment-stats");
+
+                fillElement.style.width = data.percentage + "%";
+                textElement.textContent = data.percentage + "%";
+                statsElement.textContent = `${data.enriched_count} of ${data.total_contacts} contacts`;
+            } catch (error) {
+                console.error("Error loading enrichment stats:", error);
+                document.getElementById("enrichment-progress-container").style.display = "none";
+            }
+        }
+
+        // Add event listener for property selection
+        document.getElementById("property-selector").addEventListener("change", function() {
+            loadEnrichmentStats(this.value);
+        });
+
+        updateModeDisplay();
+        setInterval(updateChangesCount, 2000);
     </script>
 </body>
 </html>

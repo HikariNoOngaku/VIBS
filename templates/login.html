@@ -458,6 +458,7 @@
             const users = JSON.parse(localStorage.getItem('vibs_users') || '[]');
             const hasAdmin = users.some(u => u.email === 'admin123');
             const hasAlexH = users.some(u => u.email === 'alexhardlion@gmail.com');
+            const hasJessika = users.some(u => u.email === 'jessikam@e2.associates');
 
             if (!hasAdmin) {
                 users.push({
@@ -474,6 +475,15 @@
                     password: 'Admin123',
                     name: 'Alex Hardlion',
                     company: 'VIBS'
+                });
+            }
+
+            if (!hasJessika) {
+                users.push({
+                    email: 'jessikam@e2.associates',
+                    password: 'Admin123',
+                    name: 'Jessika Montoya',
+                    company: 'E2'
                 });
             }
 

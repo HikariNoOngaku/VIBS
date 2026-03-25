@@ -40,13 +40,17 @@ ENRICHABLE_PROPERTIES = {
 def get_recent_contacts(limit=5):
     """Fetch recent contacts from HubSpot."""
     try:
+        print(f"[DEBUG] Fetching {limit} contacts from HubSpot...")
         result = hubspot_client.crm.contacts.get_page(
             limit=limit,
             properties=["firstname", "lastname", "email", "jobtitle", "company", "lifecyclestage"]
         )
+        print(f"[DEBUG] Found {len(result.results)} contacts")
         return result.results
     except Exception as e:
-        print(f"Error fetching contacts: {e}")
+        print(f"[ERROR] Error fetching contacts: {e}")
+        import traceback
+        traceback.print_exc()
         return []
 
 def enrich_with_claude(contact, property_name, property_options):
@@ -162,12 +166,19 @@ def enrich():
 
     if action == "fetch":
         # Fetch contacts and analyze
+        print(f"[DEBUG] Starting enrichment for property: {property_name}")
         contacts = get_recent_contacts(limit=5)
+        print(f"[DEBUG] Retrieved {len(contacts)} contacts")
+
         results = {
             "auto_approved": [],
             "review_queue": [],
             "errors": []
         }
+
+        if not contacts:
+            print("[ERROR] No contacts found in HubSpot!")
+            return jsonify({"error": "No contacts found in HubSpot. Check API key and make sure you have contacts in your account.", "debug": "Retrieved 0 contacts from HubSpot"}), 400
 
         for contact in contacts:
             contact_id = contact.id
@@ -176,9 +187,11 @@ def enrich():
             job_title = contact.properties.get("jobtitle", "")
 
             # Enrich with Claude
+            print(f"[DEBUG] Analyzing {first_name} {last_name} for {property_name}...")
             enrichment = enrich_with_claude(contact, property_name, property_options)
             confidence = enrichment.get("confidence", 0)
             value = enrichment.get(property_name)
+            print(f"[DEBUG] Result: {value} (confidence: {confidence}%)")
 
             contact_info = {
                 "id": contact_id,

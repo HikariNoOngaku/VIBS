@@ -449,113 +449,364 @@ def validate_user():
 
 @app.route("/api/enrich", methods=["POST"])
 def enrich():
-    """Main enrichment endpoint with test and action modes."""
+    """Main enrichment endpoint with real data fetching and comprehensive error handling."""
     data = request.json
     action = data.get("action")
     property_name = data.get("property_name", "role_inferred_l1")
-    mode = data.get("mode", "test")  # "test" = preview only, "action" = save changes
-    batch_size = data.get("batch_size", 5)  # Number of contacts to process
+    mode = data.get("mode", "test")
+    batch_size = data.get("batch_size", 5)
 
     if action == "fetch":
-        # Check if user has enough credits (only in action mode)
-        if mode == "action":
-            current_credits = get_user_credits("default_user")
-            if not check_credit_available("default_user", batch_size):
+        try:
+            # STEP 1: Validate HubSpot API Connection
+            print(f"[INFO] Starting enrichment: property={property_name}, batch_size={batch_size}, mode={mode}")
+
+            if not HUBSPOT_API_KEY:
+                print("[ERROR] HubSpot API key not configured")
                 return jsonify({
-                    "error": f"Insufficient credits. You need {batch_size} credits but have {current_credits}",
-                    "credits_available": current_credits,
-                    "credits_needed": batch_size
-                }), 402
+                    "error": "❌ HubSpot API Configuration Error",
+                    "message": "HubSpot API key is not configured. Please set HUBSPOT_API_KEY in environment.",
+                    "action": "contact_admin",
+                    "severity": "critical"
+                }), 500
 
-        # Fetch contacts and analyze (filtering out those with property already populated)
-        print(f"[DEBUG] Starting enrichment for property: {property_name} (mode={mode}, batch_size={batch_size})")
-        contacts = get_recent_contacts(limit=min(batch_size, 100), property_to_enrich=property_name)
-        print(f"[DEBUG] Retrieved {len(contacts)} contacts to enrich")
+            # STEP 2: Check Credits (Action Mode Only)
+            if mode == "action":
+                current_credits = get_user_credits("default_user")
+                if not check_credit_available("default_user", batch_size):
+                    print(f"[WARNING] Insufficient credits: needed={batch_size}, have={current_credits}")
+                    return jsonify({
+                        "error": "❌ Insufficient Credits",
+                        "message": f"You need {batch_size} credits but only have {current_credits}",
+                        "credits_available": current_credits,
+                        "credits_needed": batch_size,
+                        "action": "upgrade",
+                        "severity": "warning"
+                    }), 402
 
-        results = {
-            "auto_approved": [],
-            "review_queue": [],
-            "errors": [],
-            "mode": mode
-        }
+            # STEP 3: Fetch Real Contacts from HubSpot
+            print(f"[INFO] Fetching contacts from HubSpot for property: {property_name}")
+            try:
+                contacts = get_recent_contacts(
+                    limit=min(batch_size, 100),
+                    property_to_enrich=property_name
+                )
+                print(f"[INFO] Successfully fetched {len(contacts)} contacts from HubSpot")
+            except requests.exceptions.Timeout:
+                print("[ERROR] HubSpot API timeout")
+                return jsonify({
+                    "error": "⏱️ HubSpot API Timeout",
+                    "message": "HubSpot is taking too long to respond. Please try again in a moment.",
+                    "action": "retry",
+                    "severity": "warning"
+                }), 504
+            except requests.exceptions.ConnectionError:
+                print("[ERROR] Cannot connect to HubSpot API")
+                return jsonify({
+                    "error": "🔌 Connection Error",
+                    "message": "Cannot connect to HubSpot API. Check your internet connection.",
+                    "action": "retry",
+                    "severity": "warning"
+                }), 503
+            except ApiException as e:
+                if e.status == 401:
+                    print("[ERROR] HubSpot authentication failed - Invalid API key")
+                    return jsonify({
+                        "error": "🔐 Authentication Failed",
+                        "message": "HubSpot API key is invalid or expired. Please verify your credentials.",
+                        "action": "configure",
+                        "severity": "critical"
+                    }), 401
+                elif e.status == 429:
+                    print("[WARNING] HubSpot rate limit reached")
+                    return jsonify({
+                        "error": "⚠️ Rate Limited",
+                        "message": "HubSpot API rate limit reached. Waiting 30 seconds before retry...",
+                        "action": "retry",
+                        "retry_after": 30,
+                        "severity": "warning"
+                    }), 429
+                else:
+                    print(f"[ERROR] HubSpot API error: {e.status} - {str(e)}")
+                    return jsonify({
+                        "error": "❌ HubSpot API Error",
+                        "message": f"HubSpot returned error: {e.reason if hasattr(e, 'reason') else str(e)}",
+                        "action": "retry",
+                        "severity": "error"
+                    }), 500
+            except Exception as e:
+                print(f"[ERROR] Unexpected error fetching contacts: {str(e)}")
+                return jsonify({
+                    "error": "❌ Unexpected Error",
+                    "message": f"An unexpected error occurred: {str(e)}",
+                    "action": "retry",
+                    "severity": "error"
+                }), 500
 
-        if not contacts:
-            print("[ERROR] No contacts found in HubSpot!")
-            return jsonify({"error": "No contacts found in HubSpot. Check API key and make sure you have contacts in your account.", "debug": "Retrieved 0 contacts from HubSpot"}), 400
+            # Check if contacts were found
+            if not contacts or len(contacts) == 0:
+                print(f"[WARNING] No contacts found for enrichment (property: {property_name})")
+                return jsonify({
+                    "error": "ℹ️ No Contacts to Enrich",
+                    "message": f"No contacts found in HubSpot that need {property_name} enrichment. All contacts already have this property filled or enriched.",
+                    "contacts_checked": 0,
+                    "action": "select_different_property",
+                    "severity": "info"
+                }), 400
 
-        for contact in contacts:
-            contact_id = contact.id
-            first_name = contact.properties.get("firstname", "")
-            last_name = contact.properties.get("lastname", "")
-            job_title = contact.properties.get("jobtitle", "")
+            # STEP 4: Process Contacts with AI Enrichment
+            results = {
+                "auto_approved": [],
+                "review_queue": [],
+                "errors": [],
+                "mode": mode,
+                "property_name": property_name,
+                "total_processed": 0,
+                "successful": 0,
+                "failed": 0,
+                "notifications": []
+            }
 
-            # Get property options if available
+            # Get property options
             property_options = []
             if property_name in HUBSPOT_PROPERTIES:
                 property_options = HUBSPOT_PROPERTIES[property_name].get("options", [])
 
-            # Enrich with Claude
-            print(f"[DEBUG] Analyzing {first_name} {last_name} for {property_name}...")
-            enrichment = enrich_with_claude(contact, property_name, options=property_options)
-            print(f"[DEBUG] Got enrichment: {enrichment}")
-            confidence = enrichment.get("confidence", 0)
-            value = enrichment.get(property_name)
-            print(f"[DEBUG] Value: {value}, Confidence: {confidence}")
+            for idx, contact in enumerate(contacts, 1):
+                try:
+                    contact_id = contact.id
+                    first_name = contact.properties.get("firstname", "Unknown")
+                    last_name = contact.properties.get("lastname", "")
+                    email = contact.properties.get("email", "")
+                    job_title = contact.properties.get("jobtitle", "")
+                    company = contact.properties.get("company", "")
 
-            contact_info = {
-                "id": contact_id,
-                "name": f"{first_name} {last_name}",
-                "job_title": job_title,
-                "suggested_value": value,
-                "confidence": confidence,
-                "reasoning": enrichment.get("reasoning", ""),
-                "property_name": property_name
-            }
+                    print(f"[INFO] Processing contact {idx}/{len(contacts)}: {first_name} {last_name}")
 
-            # Track enrichment history
-            track_enrichment(contact_id, property_name, source="claude")
+                    # Skip invalid contacts
+                    if not email and not first_name:
+                        print(f"[WARNING] Skipping contact {contact_id} - missing required fields")
+                        results["errors"].append({
+                            "contact_id": contact_id,
+                            "error": "Missing email and name",
+                            "severity": "warning"
+                        })
+                        continue
 
-            # Route by confidence
-            if confidence >= 84:
-                # Auto-approve - only save if in action mode
-                if mode == "action":
-                    update_hubspot_contact(contact_id, property_name, value, confidence)
-                    contact_info["status"] = "auto_approved"
-                    contact_info["message"] = "✅ Saved to HubSpot"
-                else:
-                    contact_info["status"] = "auto_approved"
-                    contact_info["message"] = "[TEST MODE] Would be saved to HubSpot"
-                results["auto_approved"].append(contact_info)
+                    # Enrich with Claude AI
+                    try:
+                        enrichment = enrich_with_claude(contact, property_name, options=property_options)
+                        confidence = enrichment.get("confidence", 0)
+                        value = enrichment.get(property_name)
+                        reasoning = enrichment.get("reasoning", "")
+
+                        if not value:
+                            print(f"[WARNING] Claude could not determine value for {contact_id}")
+                            results["errors"].append({
+                                "contact_id": contact_id,
+                                "name": f"{first_name} {last_name}",
+                                "error": "Claude could not determine a value",
+                                "severity": "warning"
+                            })
+                            continue
+
+                    except Exception as e:
+                        print(f"[ERROR] Claude API error for contact {contact_id}: {str(e)}")
+                        results["errors"].append({
+                            "contact_id": contact_id,
+                            "name": f"{first_name} {last_name}",
+                            "error": f"AI analysis failed: {str(e)}",
+                            "severity": "error"
+                        })
+                        results["failed"] += 1
+                        continue
+
+                    # Build contact info for response
+                    contact_info = {
+                        "id": contact_id,
+                        "name": f"{first_name} {last_name}".strip(),
+                        "email": email,
+                        "job_title": job_title,
+                        "company": company,
+                        "suggested_value": value,
+                        "confidence": confidence,
+                        "reasoning": reasoning,
+                        "property_name": property_name
+                    }
+
+                    # Track enrichment
+                    track_enrichment(contact_id, property_name, source="claude")
+
+                    # Route by confidence
+                    if confidence >= 84:
+                        contact_info["status"] = "auto_approved"
+                        contact_info["message"] = "✅ High confidence - Auto-approved"
+                        if mode == "action":
+                            update_hubspot_contact(contact_id, property_name, value, confidence)
+                            contact_info["saved"] = True
+                        results["auto_approved"].append(contact_info)
+                    else:
+                        contact_info["status"] = "review"
+                        contact_info["message"] = "⚠️ Manual review required"
+                        results["review_queue"].append(contact_info)
+
+                    results["successful"] += 1
+                    results["total_processed"] += 1
+
+                except Exception as e:
+                    print(f"[ERROR] Error processing contact {contact_id}: {str(e)}")
+                    results["errors"].append({
+                        "contact_id": contact_id,
+                        "error": str(e),
+                        "severity": "error"
+                    })
+                    results["failed"] += 1
+
+            # STEP 5: Handle Credits
+            if mode == "action" and results["successful"] > 0:
+                try:
+                    remaining_credits = deduct_credits("default_user", results["successful"])
+                    results["credits_remaining"] = remaining_credits
+                    results["credits_deducted"] = results["successful"]
+                    results["notifications"].append({
+                        "type": "success",
+                        "message": f"✅ {results['successful']} contacts enriched. {remaining_credits} credits remaining."
+                    })
+                except Exception as e:
+                    print(f"[ERROR] Credit deduction failed: {str(e)}")
+                    results["notifications"].append({
+                        "type": "warning",
+                        "message": f"⚠️ Contacts enriched but credit deduction failed. Contact support."
+                    })
             else:
-                # Add to review queue
-                contact_info["status"] = "reviewing"
-                contact_info["message"] = "⚠️ Requires manual review" if mode == "action" else "[TEST MODE] Would require manual review"
-                results["review_queue"].append(contact_info)
+                results["credits_remaining"] = get_user_credits("default_user")
+                results["credits_would_deduct"] = results["successful"]
 
-        # Deduct credits in action mode
-        if mode == "action":
-            remaining_credits = deduct_credits("default_user", len(contacts))
-            results["credits_remaining"] = remaining_credits
-            results["credits_deducted"] = len(contacts)
-        else:
-            # In test mode, don't deduct credits, but show what would be deducted
-            results["credits_remaining"] = get_user_credits("default_user")
-            results["credits_would_deduct"] = len(contacts)
+            # Add summary notification
+            if results["failed"] > 0:
+                results["notifications"].append({
+                    "type": "warning",
+                    "message": f"⚠️ {results['failed']} contact(s) failed processing. Check error details."
+                })
 
-        return jsonify(results)
+            print(f"[INFO] Enrichment complete: {results['successful']} successful, {results['failed']} failed")
+            return jsonify(results)
+
+        except Exception as e:
+            print(f"[ERROR] Unhandled exception in enrich endpoint: {str(e)}")
+            return jsonify({
+                "error": "❌ Server Error",
+                "message": "An unexpected server error occurred. Please try again.",
+                "action": "retry",
+                "severity": "error"
+            }), 500
 
     elif action == "approve":
-        # Manually approve a contact
+        # Manually approve and update a contact
         contact_id = data.get("contact_id")
         value = data.get("value")
         confidence = data.get("confidence", 0)
+        property_name = data.get("property_name")
 
-        success = update_hubspot_contact(contact_id, property_name, value, confidence)
-        return jsonify({"success": success})
+        if not contact_id or not value or not property_name:
+            return jsonify({
+                "success": False,
+                "error": "Missing required fields: contact_id, value, property_name"
+            }), 400
+
+        try:
+            # Check credits in action mode
+            if mode == "action":
+                if not check_credit_available("default_user", 1):
+                    return jsonify({
+                        "success": False,
+                        "error": "❌ Insufficient Credits",
+                        "message": "You don't have enough credits for this approval.",
+                        "severity": "warning"
+                    }), 402
+
+            # Update HubSpot
+            success = update_hubspot_contact(contact_id, property_name, value, confidence)
+
+            if success:
+                # Deduct credit if in action mode
+                if mode == "action":
+                    remaining_credits = deduct_credits("default_user", 1)
+                    return jsonify({
+                        "success": True,
+                        "message": "✅ Contact enriched and saved to HubSpot",
+                        "credits_remaining": remaining_credits,
+                        "severity": "success"
+                    })
+                else:
+                    return jsonify({
+                        "success": True,
+                        "message": "[TEST MODE] Would be saved to HubSpot",
+                        "severity": "info"
+                    })
+            else:
+                return jsonify({
+                    "success": False,
+                    "error": "❌ HubSpot Update Failed",
+                    "message": "Could not update contact in HubSpot. Please try again.",
+                    "severity": "error"
+                }), 500
+
+        except ApiException as e:
+            if e.status == 401:
+                return jsonify({
+                    "success": False,
+                    "error": "🔐 HubSpot Authentication Failed",
+                    "message": "HubSpot API key is invalid.",
+                    "severity": "critical"
+                }), 401
+            elif e.status == 429:
+                return jsonify({
+                    "success": False,
+                    "error": "⚠️ Rate Limited",
+                    "message": "HubSpot rate limit reached. Please wait before trying again.",
+                    "severity": "warning",
+                    "retry_after": 30
+                }), 429
+            else:
+                print(f"[ERROR] HubSpot API error on approve: {e.status} - {str(e)}")
+                return jsonify({
+                    "success": False,
+                    "error": "❌ HubSpot Error",
+                    "message": f"HubSpot error: {str(e)}",
+                    "severity": "error"
+                }), 500
+        except Exception as e:
+            print(f"[ERROR] Error approving contact {contact_id}: {str(e)}")
+            return jsonify({
+                "success": False,
+                "error": "❌ Error",
+                "message": str(e),
+                "severity": "error"
+            }), 500
 
     elif action == "skip":
-        # Skip a contact (no update)
-        return jsonify({"success": True})
+        # Skip a contact (no update, no credits deducted)
+        contact_id = data.get("contact_id")
+        property_name = data.get("property_name")
+
+        try:
+            # Still track that we reviewed this contact
+            track_enrichment(contact_id, property_name, source="skipped")
+
+            return jsonify({
+                "success": True,
+                "message": "✅ Contact skipped",
+                "severity": "info"
+            })
+        except Exception as e:
+            print(f"[ERROR] Error skipping contact {contact_id}: {str(e)}")
+            return jsonify({
+                "success": False,
+                "error": "Error skipping contact",
+                "message": str(e),
+                "severity": "error"
+            }), 500
 
     return jsonify({"error": "Invalid action"}), 400
 

@@ -1046,6 +1046,89 @@
                 gap: 10px;
             }
         }
+        /* NOTIFICATIONS */
+        .notification {
+            margin-bottom: 12px;
+            padding: 14px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            animation: slideIn 0.3s ease-out;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 100%;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .notification.success {
+            background: #ecfdf5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+
+        .notification.error {
+            background: #fef2f2;
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+
+        .notification.warning {
+            background: #fffbeb;
+            color: #92400e;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .notification.info {
+            background: #eff6ff;
+            color: #0c4a6e;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .notification-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .notification-content {
+            flex: 1;
+            line-height: 1.4;
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+            padding: 0;
+            color: inherit;
+        }
+
+        .notification-close:hover {
+            opacity: 1;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .notification-message {
+            font-size: 13px;
+            opacity: 0.9;
+        }
     </style>
 </head>
 <body>
@@ -1080,6 +1163,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Notification System -->
+    <div id="notification-container" style="position: fixed; top: 80px; right: 20px; z-index: 1000; max-width: 400px;"></div>
 
     <!-- Main -->
     <div class="main-container">
@@ -1320,6 +1406,67 @@
                 window.location.href = '/login';
             }
         });
+
+        // NOTIFICATION SYSTEM
+        function showNotification(message, type = "info", title = null, duration = 5000) {
+            const container = document.getElementById("notification-container");
+            const notification = document.createElement("div");
+            notification.className = `notification ${type}`;
+
+            const icons = {
+                success: "✅",
+                error: "❌",
+                warning: "⚠️",
+                info: "ℹ️"
+            };
+
+            const titleText = title || {
+                success: "Success",
+                error: "Error",
+                warning: "Warning",
+                info: "Information"
+            }[type];
+
+            notification.innerHTML = `
+                <div class="notification-icon">${icons[type]}</div>
+                <div class="notification-content">
+                    <div class="notification-title">${titleText}</div>
+                    <div class="notification-message">${message}</div>
+                </div>
+                <button class="notification-close">×</button>
+            `;
+
+            container.appendChild(notification);
+
+            const closeBtn = notification.querySelector(".notification-close");
+            closeBtn.addEventListener("click", () => {
+                notification.style.animation = "slideIn 0.3s ease-out reverse";
+                setTimeout(() => notification.remove(), 300);
+            });
+
+            if (duration > 0) {
+                setTimeout(() => {
+                    if (notification.parentElement) {
+                        notification.style.animation = "slideIn 0.3s ease-out reverse";
+                        setTimeout(() => notification.remove(), 300);
+                    }
+                }, duration);
+            }
+        }
+
+        function showErrorNotification(error) {
+            // Handle error response from backend
+            if (typeof error === "object") {
+                showNotification(
+                    error.message || "An error occurred",
+                    error.severity || "error",
+                    error.error || "Error",
+                    error.severity === "critical" ? 0 : 6000
+                );
+            } else {
+                showNotification(error, "error", "Error");
+            }
+        }
 
         document.getElementById("btn-enrich").addEventListener("click", startEnrichment);
         document.getElementById("btn-reset").addEventListener("click", resetUI);
@@ -1581,6 +1728,30 @@
 
                 updateProgress(70);
                 const data = await response.json();
+
+                // Check for API errors
+                if (!response.ok) {
+                    // API returned an error response
+                    showErrorNotification(data);
+                    updateProgress(0);
+                    document.querySelectorAll(".stage-item").forEach(el => {
+                        el.classList.remove('completed', 'active');
+                        el.classList.add('pending');
+                    });
+                    return;
+                }
+
+                // Check if data contains errors
+                if (data.error) {
+                    showErrorNotification(data);
+                    updateProgress(0);
+                    document.querySelectorAll(".stage-item").forEach(el => {
+                        el.classList.remove('completed', 'active');
+                        el.classList.add('pending');
+                    });
+                    return;
+                }
+
                 updateStage("analyzing", "completed");
 
                 updateStage("processing", "active");
@@ -1588,6 +1759,32 @@
                 await new Promise(r => setTimeout(r, 300));
 
                 displayResults(data);
+
+                // Show success notification with summary
+                const totalEnriched = (data.auto_approved?.length || 0) + (data.review_queue?.length || 0);
+                if (totalEnriched > 0) {
+                    showNotification(
+                        `Successfully processed ${totalEnriched} contact(s)${data.credits_deducted ? `. ${data.credits_deducted} credits deducted.` : ''}`,
+                        "success",
+                        "Enrichment Complete"
+                    );
+                }
+
+                // Show any warnings/errors
+                if (data.errors && data.errors.length > 0) {
+                    showNotification(
+                        `${data.errors.length} contact(s) could not be processed`,
+                        "warning",
+                        "Some Errors Occurred"
+                    );
+                }
+
+                // Show notifications from backend
+                if (data.notifications && Array.isArray(data.notifications)) {
+                    data.notifications.forEach(notif => {
+                        showNotification(notif.message, notif.type || "info");
+                    });
+                }
 
                 updateProgress(100);
                 updateStage("processing", "completed");
@@ -1598,7 +1795,16 @@
                 updateChangesCount();
             } catch (error) {
                 console.error("Error:", error);
-                alert("Error enriching contacts: " + error.message);
+                showNotification(
+                    error.message || "An unexpected error occurred",
+                    "error",
+                    "Connection Error"
+                );
+                updateProgress(0);
+                document.querySelectorAll(".stage-item").forEach(el => {
+                    el.classList.remove('completed', 'active');
+                    el.classList.add('pending');
+                });
             } finally {
                 setTimeout(() => {
                     document.getElementById("loading").style.display = "none";
@@ -1719,37 +1925,56 @@
 
                 const result = await response.json();
 
-                if (result.success) {
-                    // Update button to show checkmark
-                    approveBtn.innerHTML = "✓ Approved";
-                    approveBtn.style.background = "#10b981";
-
-                    // Remove the contact card after a brief delay
-                    setTimeout(() => {
-                        const card = approveBtn.closest(".contact-card");
-                        if (card) {
-                            card.style.opacity = "0.5";
-                            card.style.pointerEvents = "none";
-                        }
-                    }, 500);
-
-                    // Update progress bar
-                    const selectedProperty = document.getElementById("property-selector").value;
-                    if (selectedProperty) {
-                        await loadEnrichmentStats(selectedProperty);
-                    }
-
-                    // Update changes count
-                    updateChangesCount();
-                } else {
+                if (!response.ok || !result.success) {
+                    // Handle error response
                     approveBtn.disabled = false;
                     approveBtn.style.opacity = "1";
-                    alert("Error approving contact: " + (result.error || "Unknown error"));
+
+                    if (result.error) {
+                        showErrorNotification(result);
+                    } else {
+                        showNotification(
+                            result.message || "Failed to approve contact",
+                            "error",
+                            "Approval Failed"
+                        );
+                    }
+                    return;
                 }
+
+                // Success
+                approveBtn.innerHTML = "✓ Approved";
+                approveBtn.style.background = "#10b981";
+
+                // Show success notification
+                showNotification(result.message || "Contact approved and saved", "success", "Approved");
+
+                // Remove the contact card after a brief delay
+                setTimeout(() => {
+                    const card = approveBtn.closest(".contact-card");
+                    if (card) {
+                        card.style.opacity = "0.5";
+                        card.style.pointerEvents = "none";
+                    }
+                }, 500);
+
+                // Update progress bar
+                const selectedProperty = document.getElementById("property-selector").value;
+                if (selectedProperty) {
+                    await loadEnrichmentStats(selectedProperty);
+                }
+
+                // Update changes count
+                updateChangesCount();
+
             } catch (error) {
                 approveBtn.disabled = false;
                 approveBtn.style.opacity = "1";
-                alert("Error: " + error.message);
+                showNotification(
+                    error.message || "Failed to process approval",
+                    "error",
+                    "Network Error"
+                );
             }
         }
 

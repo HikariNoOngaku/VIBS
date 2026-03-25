@@ -1,6 +1,6 @@
 flask==3.0.0
 hubspot-api-client==8.1.0
-anthropic==0.8.6
+anthropic==0.31.0
 python-dotenv==1.0.0
 requests==2.31.0
 gunicorn==21.2.0

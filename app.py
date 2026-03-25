@@ -1,9 +1,9 @@
 import os
 import json
+import requests
 from flask import Flask, render_template, jsonify, request
 from hubspot.crm.contacts import ApiClient as ContactsApiClient
 from hubspot.crm.contacts import ApiException
-from anthropic import Anthropic
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -18,8 +18,8 @@ CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
 from hubspot import Client as HubSpotClient
 hubspot_client = HubSpotClient(access_token=HUBSPOT_API_KEY)
 
-# Claude client
-anthropic_client = Anthropic(api_key=CLAUDE_API_KEY)
+# Claude API endpoint
+CLAUDE_API_URL = "https://api.anthropic.com/v1/messages"
 
 # Role options from taxonomy
 ROLE_OPTIONS = [
@@ -81,16 +81,26 @@ Base confidence on how clear the role deduction is:
 """
 
     try:
-        response = anthropic_client.messages.create(
-            model="claude-opus-4-6",
-            max_tokens=500,
-            messages=[
+        headers = {
+            "x-api-key": CLAUDE_API_KEY,
+            "anthropic-version": "2023-06-01",
+            "content-type": "application/json"
+        }
+
+        payload = {
+            "model": "claude-opus-4-6",
+            "max_tokens": 500,
+            "messages": [
                 {"role": "user", "content": prompt}
             ]
-        )
+        }
 
-        # Parse response
-        response_text = response.content[0].text
+        response = requests.post(CLAUDE_API_URL, json=payload, headers=headers, timeout=30)
+        response.raise_for_status()
+
+        data = response.json()
+        response_text = data["content"][0]["text"]
+
         # Extract JSON from response
         json_start = response_text.find("{")
         json_end = response_text.rfind("}") + 1

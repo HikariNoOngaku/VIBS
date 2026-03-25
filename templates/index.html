@@ -277,6 +277,14 @@
             </div>
         </div>
 
+        <!-- Property Selector -->
+        <div style="margin-bottom: 20px;">
+            <label for="property-selector" style="display: block; font-weight: 600; margin-bottom: 8px; color: #333;">Select Property to Enrich:</label>
+            <select id="property-selector" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;">
+                <option value="">Loading properties...</option>
+            </select>
+        </div>
+
         <!-- Action Buttons -->
         <div class="button-group">
             <button class="btn-primary" id="btn-enrich">Start Enrichment (5 Contacts)</button>
@@ -321,8 +329,34 @@
         document.getElementById("btn-enrich").addEventListener("click", startEnrichment);
         document.getElementById("btn-reset").addEventListener("click", resetUI);
 
+        // Load properties on page load
+        document.addEventListener("DOMContentLoaded", loadProperties);
+
+        async function loadProperties() {
+            try {
+                const response = await fetch(`${API_BASE}/properties`);
+                const data = await response.json();
+
+                const selector = document.getElementById("property-selector");
+                selector.innerHTML = data.properties.map(prop =>
+                    `<option value="${prop.name}">${prop.label}</option>`
+                ).join("");
+            } catch (error) {
+                console.error("Error loading properties:", error);
+                alert("Error loading properties: " + error.message);
+            }
+        }
+
         async function startEnrichment() {
             const btn = document.getElementById("btn-enrich");
+            const propertySelector = document.getElementById("property-selector");
+            const selectedProperty = propertySelector.value;
+
+            if (!selectedProperty) {
+                alert("Please select a property to enrich");
+                return;
+            }
+
             btn.disabled = true;
             document.getElementById("loading").style.display = "block";
             document.getElementById("results").style.display = "none";
@@ -331,7 +365,10 @@
                 const response = await fetch(`${API_BASE}/enrich`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ action: "fetch" })
+                    body: JSON.stringify({
+                        action: "fetch",
+                        property_name: selectedProperty
+                    })
                 });
 
                 const data = await response.json();
@@ -365,7 +402,7 @@
                         <div class="contact-info">
                             <h3>${contact.name}</h3>
                             <div class="contact-detail">Job Title: ${contact.job_title}</div>
-                            <div class="contact-role">→ ${contact.suggested_role}</div>
+                            <div class="contact-role">→ ${contact.suggested_value}</div>
                             <div class="confidence">Confidence: ${contact.confidence}%</div>
                             <div class="contact-detail"><em>${contact.reasoning}</em></div>
                         </div>
@@ -381,12 +418,12 @@
                         <div class="contact-info">
                             <h3>${contact.name}</h3>
                             <div class="contact-detail">Job Title: ${contact.job_title}</div>
-                            <div class="contact-role">→ ${contact.suggested_role}</div>
+                            <div class="contact-role">→ ${contact.suggested_value}</div>
                             <div class="confidence">Confidence: ${contact.confidence}% ⚠️</div>
                             <div class="contact-detail"><em>${contact.reasoning}</em></div>
                         </div>
                         <div class="contact-actions">
-                            <button class="btn-small" onclick="approveContact('${contact.id}', '${contact.suggested_role}', ${contact.confidence})">Approve</button>
+                            <button class="btn-small" onclick="approveContact('${contact.id}', '${contact.suggested_value}', ${contact.confidence}, '${contact.property_name}')">Approve</button>
                             <button class="btn-small btn-skip" onclick="skipContact('${contact.id}')">Skip</button>
                         </div>
                     </div>
@@ -396,7 +433,7 @@
             document.getElementById("results").style.display = "block";
         }
 
-        async function approveContact(contactId, role, confidence) {
+        async function approveContact(contactId, value, confidence, propertyName) {
             try {
                 await fetch(`${API_BASE}/enrich`, {
                     method: "POST",
@@ -404,8 +441,9 @@
                     body: JSON.stringify({
                         action: "approve",
                         contact_id: contactId,
-                        role: role,
-                        confidence: confidence
+                        value: value,
+                        confidence: confidence,
+                        property_name: propertyName
                     })
                 });
                 alert("Contact approved and saved to HubSpot!");

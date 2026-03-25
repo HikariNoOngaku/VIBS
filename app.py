@@ -21,16 +21,21 @@ hubspot_client = HubSpotClient(access_token=HUBSPOT_API_KEY)
 # Claude API endpoint
 CLAUDE_API_URL = "https://api.anthropic.com/v1/messages"
 
-# Role options from taxonomy
-ROLE_OPTIONS = [
-    "Sales",
-    "Marketing",
-    "Design/Drafting",
-    "Planning/Development",
-    "Executive",
-    "Approval Submission",
-    "Approval Processing"
-]
+# Property enrichment configuration
+ENRICHABLE_PROPERTIES = {
+    "role_inferred_l1": {
+        "label": "Role (L1)",
+        "options": ["Sales", "Marketing", "Design/Drafting", "Planning/Development", "Executive", "Approval Submission", "Approval Processing"]
+    },
+    "industry": {
+        "label": "Industry",
+        "options": ["Technology", "Finance", "Healthcare", "Retail", "Manufacturing", "Services", "Other"]
+    },
+    "company_size": {
+        "label": "Company Size",
+        "options": ["1-10", "11-50", "51-200", "201-1000", "1000+"]
+    }
+}
 
 def get_recent_contacts(limit=5):
     """Fetch recent contacts from HubSpot."""
@@ -44,8 +49,8 @@ def get_recent_contacts(limit=5):
         print(f"Error fetching contacts: {e}")
         return []
 
-def deduce_role_with_claude(contact):
-    """Use Claude to deduce contact role with confidence score."""
+def enrich_with_claude(contact, property_name, property_options):
+    """Use Claude to enrich any contact property with confidence score."""
 
     # Extract contact data
     props = contact.properties
@@ -55,8 +60,10 @@ def deduce_role_with_claude(contact):
     job_title = props.get("jobtitle", "")
     company = props.get("company", "")
 
-    # Build prompt
-    prompt = f"""Based on the following contact information, deduce their role in the organization.
+    # Build dynamic prompt
+    options_text = chr(10).join([f"- {opt}" for opt in property_options])
+
+    prompt = f"""Based on the following contact information, deduce their {property_name}.
 
 Contact Information:
 - Name: {first_name} {last_name}
@@ -64,20 +71,20 @@ Contact Information:
 - Job Title: {job_title}
 - Company: {company}
 
-Available Role Categories:
-{chr(10).join([f"- {role}" for role in ROLE_OPTIONS])}
+Available Options:
+{options_text}
 
 Please respond in JSON format with:
 {{
-  "role": "<selected role from list>",
+  "value": "<selected option from list>",
   "confidence": <0-100>,
   "reasoning": "<brief explanation>"
 }}
 
-Base confidence on how clear the role deduction is:
-- >95%: Job title explicitly matches role (e.g., "Sales Director" → Sales)
-- 75-95%: Job title implies role but less explicit (e.g., "Account Manager" → Sales)
-- <75%: Job title is ambiguous (e.g., "Operations Manager" could be multiple roles)
+Base confidence on how clear the deduction is:
+- >95%: Very clear match from existing data
+- 75-95%: Likely match but some ambiguity
+- <75%: Uncertain, requires review
 """
 
     try:
@@ -107,24 +114,28 @@ Base confidence on how clear the role deduction is:
         json_str = response_text[json_start:json_end]
         result = json.loads(json_str)
 
+        # Rename "value" to match property_name for consistency
+        result[property_name] = result.pop("value", None)
+
         return result
     except Exception as e:
         print(f"Error calling Claude: {e}")
         return {
-            "role": None,
+            property_name: None,
             "confidence": 0,
             "reasoning": f"Error: {str(e)}"
         }
 
-def update_hubspot_contact(contact_id, role, confidence):
-    """Update contact with role_inferred_l1 property in HubSpot."""
+def update_hubspot_contact(contact_id, property_name, value, confidence):
+    """Update contact with enriched property in HubSpot."""
     try:
+        update_data = {
+            property_name: value,
+            f"{property_name}_confidence": str(confidence)  # Store confidence as string
+        }
         hubspot_client.crm.contacts.update(
             contact_id,
-            properties={
-                "role_inferred_l1": role,
-                "role_inferred_l1_confidence": str(confidence)  # Store confidence as string
-            }
+            properties=update_data
         )
         return True
     except Exception as e:
@@ -140,6 +151,14 @@ def enrich():
     """Main enrichment endpoint."""
     data = request.json
     action = data.get("action")
+    property_name = data.get("property_name", "role_inferred_l1")
+
+    # Get property config
+    if property_name not in ENRICHABLE_PROPERTIES:
+        return jsonify({"error": f"Property {property_name} not enrichable"}), 400
+
+    prop_config = ENRICHABLE_PROPERTIES[property_name]
+    property_options = prop_config["options"]
 
     if action == "fetch":
         # Fetch contacts and analyze
@@ -156,24 +175,25 @@ def enrich():
             last_name = contact.properties.get("lastname", "")
             job_title = contact.properties.get("jobtitle", "")
 
-            # Deduce role
-            deduction = deduce_role_with_claude(contact)
-            confidence = deduction.get("confidence", 0)
-            role = deduction.get("role")
+            # Enrich with Claude
+            enrichment = enrich_with_claude(contact, property_name, property_options)
+            confidence = enrichment.get("confidence", 0)
+            value = enrichment.get(property_name)
 
             contact_info = {
                 "id": contact_id,
                 "name": f"{first_name} {last_name}",
                 "job_title": job_title,
-                "suggested_role": role,
+                "suggested_value": value,
                 "confidence": confidence,
-                "reasoning": deduction.get("reasoning", "")
+                "reasoning": enrichment.get("reasoning", ""),
+                "property_name": property_name
             }
 
             # Route by confidence
             if confidence >= 95:
                 # Auto-approve and save
-                update_hubspot_contact(contact_id, role, confidence)
+                update_hubspot_contact(contact_id, property_name, value, confidence)
                 contact_info["status"] = "auto_approved"
                 results["auto_approved"].append(contact_info)
             else:
@@ -186,10 +206,10 @@ def enrich():
     elif action == "approve":
         # Manually approve a contact
         contact_id = data.get("contact_id")
-        role = data.get("role")
+        value = data.get("value")
         confidence = data.get("confidence", 0)
 
-        success = update_hubspot_contact(contact_id, role, confidence)
+        success = update_hubspot_contact(contact_id, property_name, value, confidence)
         return jsonify({"success": success})
 
     elif action == "skip":
@@ -197,6 +217,20 @@ def enrich():
         return jsonify({"success": True})
 
     return jsonify({"error": "Invalid action"}), 400
+
+@app.route("/api/properties", methods=["GET"])
+def get_properties():
+    """Get available enrichable properties."""
+    return jsonify({
+        "properties": [
+            {
+                "name": name,
+                "label": config["label"],
+                "options": config["options"]
+            }
+            for name, config in ENRICHABLE_PROPERTIES.items()
+        ]
+    })
 
 @app.route("/api/health", methods=["GET"])
 def health():

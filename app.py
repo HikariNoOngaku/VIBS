@@ -41,12 +41,13 @@ def get_recent_contacts(limit=5):
     """Fetch recent contacts from HubSpot."""
     try:
         print(f"[DEBUG] Fetching {limit} contacts from HubSpot...")
-        result = hubspot_client.crm.contacts.get_page(
+        result = hubspot_client.crm.contacts.get_all(
             limit=limit,
             properties=["firstname", "lastname", "email", "jobtitle", "company", "lifecyclestage"]
         )
-        print(f"[DEBUG] Found {len(result.results)} contacts")
-        return result.results
+        contacts = list(result)[:limit]
+        print(f"[DEBUG] Found {len(contacts)} contacts")
+        return contacts
     except Exception as e:
         print(f"[ERROR] Error fetching contacts: {e}")
         import traceback
